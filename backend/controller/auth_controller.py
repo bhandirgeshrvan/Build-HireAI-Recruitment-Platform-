@@ -1,12 +1,18 @@
+import bcrypt
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from passlib.context import CryptContext
 from models.models import User, Candidate
 from core.jwt import create_access_token
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 VALID_ROLES = {"candidate", "recruiter", "admin"}
+
+
+def _hash(password: str) -> str:
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+
+
+def _verify(password: str, hashed: str) -> bool:
+    return bcrypt.checkpw(password.encode(), hashed.encode())
 
 
 def _token_response(user: User) -> dict:
@@ -26,8 +32,7 @@ def register_user(db: Session, name: str, email: str, password: str, role: str):
     if len(password) < 6:
         raise HTTPException(status_code=400, detail="Password must be at least 6 characters.")
 
-    hashed = pwd_context.hash(password)
-    user = User(name=name, email=email.lower(), password=hashed, role=role)
+    user = User(name=name, email=email.lower(), password=_hash(password), role=role)
     db.add(user)
     db.flush()
 
@@ -41,7 +46,7 @@ def register_user(db: Session, name: str, email: str, password: str, role: str):
 
 def login_user(db: Session, email: str, password: str):
     user = db.query(User).filter(User.email == email.lower()).first()
-    if not user or not pwd_context.verify(password, user.password):
+    if not user or not _verify(password, user.password):
         raise HTTPException(status_code=401, detail="Invalid email or password.")
     return _token_response(user)
 
