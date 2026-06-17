@@ -1,12 +1,12 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from models.models import User, Job, Candidate, Application, RoleEnum
+from models.models import User, Job, Candidate, Application
 
 
 def get_admin_stats(db: Session):
     total_users = db.query(User).count()
-    recruiters = db.query(User).filter(User.role == RoleEnum.recruiter).count()
-    candidates = db.query(User).filter(User.role == RoleEnum.candidate).count()
+    recruiters = db.query(User).filter(User.role == "recruiter").count()
+    candidates = db.query(User).filter(User.role == "candidate").count()
     jobs_posted = db.query(Job).count()
     active_jobs = db.query(Job).filter(Job.status == "Active").count()
     applications = db.query(Application).count()
