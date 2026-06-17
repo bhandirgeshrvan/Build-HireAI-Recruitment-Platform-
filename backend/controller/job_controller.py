@@ -7,7 +7,7 @@ def get_all_jobs(db: Session, status: str = None):
     q = db.query(Job)
     if status:
         q = q.filter(Job.status == status)
-    return q.all()
+    return q.order_by(Job.created_at.desc()).all()
 
 
 def get_job(db: Session, job_id: int):
@@ -17,7 +17,12 @@ def get_job(db: Session, job_id: int):
     return job
 
 
-def create_job(db: Session, data: dict):
+def get_jobs_by_recruiter(db: Session, recruiter_id: int):
+    return db.query(Job).filter(Job.recruiter_id == recruiter_id).order_by(Job.created_at.desc()).all()
+
+
+def create_job(db: Session, data: dict, recruiter_id: int):
+    data["recruiter_id"] = recruiter_id
     job = Job(**data)
     db.add(job)
     db.commit()
@@ -25,8 +30,10 @@ def create_job(db: Session, data: dict):
     return job
 
 
-def update_job(db: Session, job_id: int, data: dict):
+def update_job(db: Session, job_id: int, data: dict, recruiter_id: int):
     job = get_job(db, job_id)
+    if job.recruiter_id and job.recruiter_id != recruiter_id:
+        raise HTTPException(status_code=403, detail="Not your job posting.")
     for k, v in data.items():
         setattr(job, k, v)
     db.commit()
@@ -34,8 +41,10 @@ def update_job(db: Session, job_id: int, data: dict):
     return job
 
 
-def delete_job(db: Session, job_id: int):
+def delete_job(db: Session, job_id: int, recruiter_id: int):
     job = get_job(db, job_id)
+    if job.recruiter_id and job.recruiter_id != recruiter_id:
+        raise HTTPException(status_code=403, detail="Not your job posting.")
     db.delete(job)
     db.commit()
     return {"detail": "Job deleted."}

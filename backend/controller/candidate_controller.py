@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from models.models import Candidate
+from models.models import Candidate, Job
 
 
 def get_all_candidates(db: Session, status: str = None):
@@ -34,5 +34,31 @@ def update_candidate(db: Session, candidate_id: int, data: dict):
 
 
 def rank_candidates(db: Session, job_id: int):
-    candidates = db.query(Candidate).order_by(Candidate.match_score.desc()).all()
-    return candidates
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found.")
+
+    job_skills = set(s.lower() for s in (job.skills or []))
+    candidates = db.query(Candidate).all()
+
+    ranked = []
+    for c in candidates:
+        c_skills = set(s.lower() for s in (c.skills or []))
+        matched = sorted(c_skills & job_skills)
+        score = round((len(matched) / len(job_skills) * 100) if job_skills else 0, 1)
+        ranked.append({
+            "id": c.id,
+            "name": c.name,
+            "email": c.email,
+            "role": c.role,
+            "experience": c.experience,
+            "skills": c.skills,
+            "matched_skills": matched,
+            "missing_skills": sorted(job_skills - c_skills),
+            "match_score": score,
+            "status": c.status,
+            "location": c.location,
+            "salary_exp": c.salary_exp,
+        })
+
+    return sorted(ranked, key=lambda x: x["match_score"], reverse=True)

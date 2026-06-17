@@ -200,3 +200,125 @@ export const ADMIN_STATS = {
   arr:            582000,
   churn_rate:        2.3,
 }
+
+// ── Admin dashboard ────────────────────────────────────────────────────────
+export const SUBSCRIPTION_TIERS = [
+  { tier: 'Free',       users: 1842, price: '$0/mo',   color: '#94a3b8' },
+  { tier: 'Starter',    users: 896,  price: '$49/mo',  color: '#6366f1' },
+  { tier: 'Growth',     users: 312,  price: '$149/mo', color: '#8b5cf6' },
+  { tier: 'Enterprise', users: 92,   price: '$499/mo', color: '#f59e0b' },
+]
+
+export const HEALTH_METRICS = [
+  { label: 'API Uptime',        value: '99.98%', pct: 99.98, color: '#10b981' },
+  { label: 'Avg Response Time', value: '142 ms', pct: 85,    color: '#6366f1' },
+  { label: 'DB CPU Usage',      value: '34%',    pct: 34,    color: '#f59e0b' },
+  { label: 'Error Rate',        value: '0.02%',  pct: 2,     color: '#10b981' },
+]
+
+// ── Recruiter dashboard ────────────────────────────────────────────────────
+export const WEEKLY_APPLICATIONS = [
+  { day: 'Mon', apps: 42 }, { day: 'Tue', apps: 58 },
+  { day: 'Wed', apps: 51 }, { day: 'Thu', apps: 73 },
+  { day: 'Fri', apps: 67 }, { day: 'Sat', apps: 29 },
+  { day: 'Sun', apps: 18 },
+]
+
+export const DEPT_HIRES = [
+  { dept: 'Eng',     hires: 8 },
+  { dept: 'Product', hires: 3 },
+  { dept: 'Design',  hires: 2 },
+  { dept: 'Sales',   hires: 4 },
+  { dept: 'Data',    hires: 2 },
+]
+
+export const RECRUITER_FUNNEL = [
+  { stage: 'Applied',   count: 387, color: '#6366f1' },
+  { stage: 'Screened',  count: 210, color: '#8b5cf6' },
+  { stage: 'Interview', count: 86,  color: '#f59e0b' },
+  { stage: 'Offer',     count: 28,  color: '#10b981' },
+  { stage: 'Hired',     count: 19,  color: '#22c55e' },
+]
+
+export const TODAY_SCHEDULE = [
+  { time: '10:00 AM', name: 'Alex Johnson', role: 'Senior SWE',     round: 'Technical Round', color: '#6366f1' },
+  { time: '11:30 AM', name: 'Maria Garcia', role: 'Data Scientist',  round: 'Final Round',     color: '#10b981' },
+  { time: '02:00 PM', name: 'James Wilson', role: 'DevOps Engineer', round: 'Technical Round', color: '#8b5cf6' },
+  { time: '04:00 PM', name: 'Sarah Chen',   role: 'PM',              round: 'Culture Fit',     color: '#f59e0b' },
+]
+
+// ── Candidate dashboard ────────────────────────────────────────────────────
+export const INTERVIEWS = [
+  { company: 'Stripe',  role: 'Senior SWE',    time: 'Tomorrow, 2:00 PM',   color: '#10b981' },
+  { company: 'Shopify', role: 'Backend Eng.',   time: 'Thu, Jun 20 @ 10 AM', color: '#6366f1' },
+  { company: 'Airbnb',  role: 'Full Stack Dev', time: 'Fri, Jun 21 @ 3 PM',  color: '#8b5cf6' },
+  { company: 'Netflix', role: 'Platform Eng.',  time: 'Pending Schedule',     color: '#f59e0b' },
+]
+
+export const PROFILE_TODOS = [
+  { done: true,  label: 'Work experience added' },
+  { done: true,  label: 'Skills listed' },
+  { done: true,  label: 'Education filled' },
+  { done: false, label: 'Upload resume' },
+  { done: false, label: 'Add portfolio link' },
+]
+
+// ── Resume parser ──────────────────────────────────────────────────────────
+export const SAMPLE_RESUME = {
+  name: 'Alex Johnson', email: 'alex.johnson@email.com',
+  phone: '+1 (555) 867-5309', location: 'San Francisco, CA',
+  summary: 'Senior Software Engineer with 7+ years of experience building scalable distributed systems. Passionate about ML infrastructure and developer tooling.',
+  score: 87,
+  breakdown: [
+    { label: 'Skills Match',          val: 92 },
+    { label: 'Experience Relevance',  val: 88 },
+    { label: 'Education Fit',         val: 75 },
+    { label: 'Resume Formatting',     val: 85 },
+    { label: 'Keywords Optimisation', val: 78 },
+  ],
+  skills: {
+    technical: ['Python', 'Go', 'Kubernetes', 'AWS', 'PostgreSQL', 'Redis', 'Kafka', 'Docker', 'Terraform'],
+    soft:      ['Leadership', 'Communication', 'Problem Solving', 'Agile', 'Mentoring'],
+  },
+  experience: [
+    {
+      title: 'Senior Software Engineer', company: 'Stripe', dates: 'Jan 2021 – Present',
+      bullets: [
+        'Led migration of payment pipeline to event-driven architecture (Kafka), reducing latency by 40%.',
+        'Mentored 4 junior engineers and conducted 50+ technical interviews.',
+        'Designed multi-region failover system with 99.99% uptime for $2B/day transactions.',
+      ],
+    },
+    {
+      title: 'Software Engineer', company: 'Airbnb', dates: 'Jun 2018 – Dec 2020',
+      bullets: [
+        'Built and maintained search ranking service serving 50M requests/day.',
+        'Reduced infrastructure cost by 30% via spot-instance auto-scaling on AWS.',
+      ],
+    },
+  ],
+  education: [
+    { degree: 'M.S. Computer Science', school: 'Stanford University', year: '2018', gpa: '3.9' },
+    { degree: 'B.S. Computer Science', school: 'UC Berkeley',         year: '2016', gpa: '3.7' },
+  ],
+  certifications: [
+    'AWS Solutions Architect – Professional',
+    'Certified Kubernetes Administrator (CKA)',
+  ],
+}
+
+// ── Analytics diversity ────────────────────────────────────────────────────
+export const DIVERSITY_STATS = [
+  { label: 'Gender Balance',   val: '48% / 52%', sub: 'Female / Male',        color: '#6366f1' },
+  { label: 'Underrepresented', val: '34%',        sub: 'of new hires',          color: '#8b5cf6' },
+  { label: 'Remote Hires',     val: '61%',        sub: 'of total hires',        color: '#10b981' },
+  { label: 'Referral Hires',   val: '22%',        sub: 'via employee referral', color: '#f59e0b' },
+]
+
+// ── Auth demo users ────────────────────────────────────────────────────────
+export type DBUser = { password: string; role: Role; name: string }
+export const DEMO_USERS: Record<string, DBUser> = {
+  'candidate@hireai.com': { password: 'demo123', role: 'candidate', name: 'Alex Johnson' },
+  'recruiter@hireai.com': { password: 'demo123', role: 'recruiter', name: 'Sarah Chen' },
+  'admin@hireai.com':     { password: 'demo123', role: 'admin',     name: 'Admin User' },
+}

@@ -1,42 +1,39 @@
 {
   "info": {
-    "name": "HireAI Recruitment Platform",
-    "description": "Complete API collection for HireAI backend — Auth, Jobs, Candidates, Applications, Analytics.",
+    "name": "HireAI Recruitment Platform v2",
+    "description": "JWT-authenticated API — Auth, Jobs, Candidates, Resume Upload, Skill Matching, Applications, Interview Scheduling, Analytics.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    {
-      "key": "base_url",
-      "value": "http://localhost:8000",
-      "type": "string"
-    }
+    { "key": "base_url", "value": "http://localhost:8000" },
+    { "key": "token", "value": "<paste_jwt_token_here>" }
   ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
   "item": [
     {
       "name": "Auth",
       "item": [
         {
           "name": "Register - Candidate",
+          "event": [{ "listen": "test", "script": { "exec": ["if(pm.response.code===200){pm.collectionVariables.set('token',pm.response.json().access_token)}"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Alex Johnson\",\n  \"email\": \"alex.j@email.com\",\n  \"password\": \"demo123\",\n  \"role\": \"candidate\"\n}"
-            }
+            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth","register"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Alex Johnson\",\n  \"email\": \"alex.j@email.com\",\n  \"password\": \"demo123\",\n  \"role\": \"candidate\"\n}" }
           }
         },
         {
           "name": "Register - Recruiter",
+          "event": [{ "listen": "test", "script": { "exec": ["if(pm.response.code===200){pm.collectionVariables.set('token',pm.response.json().access_token)}"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Sarah Chen\",\n  \"email\": \"recruiter@hireai.com\",\n  \"password\": \"demo123\",\n  \"role\": \"recruiter\"\n}"
-            }
+            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth","register"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Sarah Chen\",\n  \"email\": \"recruiter@hireai.com\",\n  \"password\": \"demo123\",\n  \"role\": \"recruiter\"\n}" }
           }
         },
         {
@@ -44,35 +41,36 @@
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@hireai.com\",\n  \"password\": \"demo123\",\n  \"role\": \"admin\"\n}"
-            }
+            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth","register"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@hireai.com\",\n  \"password\": \"demo123\",\n  \"role\": \"admin\"\n}" }
           }
         },
         {
           "name": "Login",
+          "event": [{ "listen": "test", "script": { "exec": ["if(pm.response.code===200){pm.collectionVariables.set('token',pm.response.json().access_token)}"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"alex.j@email.com\",\n  \"password\": \"demo123\"\n}"
-            }
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth","login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"alex.j@email.com\",\n  \"password\": \"demo123\"\n}" }
           }
         },
         {
-          "name": "Login - Invalid Password",
+          "name": "Login - Recruiter",
+          "event": [{ "listen": "test", "script": { "exec": ["if(pm.response.code===200){pm.collectionVariables.set('token',pm.response.json().access_token)}"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"alex.j@email.com\",\n  \"password\": \"wrongpassword\"\n}"
-            }
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth","login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"recruiter@hireai.com\",\n  \"password\": \"demo123\"\n}" }
+          }
+        },
+        {
+          "name": "Get Current User (me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/auth/me", "host": ["{{base_url}}"], "path": ["auth","me"] }
           }
         }
       ]
@@ -81,84 +79,99 @@
       "name": "Jobs",
       "item": [
         {
-          "name": "List All Jobs",
+          "name": "List All Jobs (public)",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{base_url}}/jobs/", "host": ["{{base_url}}"], "path": ["jobs", ""] }
+            "url": { "raw": "{{base_url}}/jobs/", "host": ["{{base_url}}"], "path": ["jobs",""] }
           }
         },
         {
           "name": "List Active Jobs",
           "request": {
             "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/jobs/?status=Active",
-              "host": ["{{base_url}}"],
-              "path": ["jobs", ""],
-              "query": [{ "key": "status", "value": "Active" }]
-            }
-          }
-        },
-        {
-          "name": "List Closed Jobs",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/jobs/?status=Closed",
-              "host": ["{{base_url}}"],
-              "path": ["jobs", ""],
-              "query": [{ "key": "status", "value": "Closed" }]
-            }
+            "url": { "raw": "{{base_url}}/jobs/?status=Active", "host": ["{{base_url}}"], "path": ["jobs",""], "query": [{ "key": "status", "value": "Active" }] }
           }
         },
         {
           "name": "Get Job by ID",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{base_url}}/jobs/1", "host": ["{{base_url}}"], "path": ["jobs", "1"] }
+            "url": { "raw": "{{base_url}}/jobs/1", "host": ["{{base_url}}"], "path": ["jobs","1"] }
           }
         },
         {
-          "name": "Create Job",
+          "name": "My Posted Jobs (recruiter)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/jobs/mine", "host": ["{{base_url}}"], "path": ["jobs","mine"] }
+          }
+        },
+        {
+          "name": "Create Job (recruiter)",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/jobs/", "host": ["{{base_url}}"], "path": ["jobs", ""] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Senior Software Engineer\",\n  \"company\": \"Stripe\",\n  \"location\": \"San Francisco, CA\",\n  \"salary_min\": 150000,\n  \"salary_max\": 220000,\n  \"type\": \"Full-time\",\n  \"experience\": \"5-8 yrs\",\n  \"skills\": [\"Python\", \"Go\", \"Kubernetes\"],\n  \"status\": \"Active\"\n}"
-            }
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/jobs/", "host": ["{{base_url}}"], "path": ["jobs",""] },
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Senior Software Engineer\",\n  \"company\": \"Stripe\",\n  \"location\": \"San Francisco, CA\",\n  \"salary_min\": 150000,\n  \"salary_max\": 220000,\n  \"type\": \"Full-time\",\n  \"experience\": \"5-8 yrs\",\n  \"skills\": [\"python\", \"go\", \"kubernetes\"],\n  \"status\": \"Active\"\n}" }
           }
         },
         {
-          "name": "Update Job",
+          "name": "Update Job (recruiter)",
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/jobs/1", "host": ["{{base_url}}"], "path": ["jobs", "1"] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"salary_max\": 230000,\n  \"status\": \"Active\"\n}"
-            }
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/jobs/1", "host": ["{{base_url}}"], "path": ["jobs","1"] },
+            "body": { "mode": "raw", "raw": "{\n  \"salary_max\": 240000,\n  \"status\": \"Active\"\n}" }
           }
         },
         {
-          "name": "Close a Job",
-          "request": {
-            "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/jobs/1", "host": ["{{base_url}}"], "path": ["jobs", "1"] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"Closed\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Delete Job",
+          "name": "Delete Job (recruiter)",
           "request": {
             "method": "DELETE",
-            "url": { "raw": "{{base_url}}/jobs/1", "host": ["{{base_url}}"], "path": ["jobs", "1"] }
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/jobs/1", "host": ["{{base_url}}"], "path": ["jobs","1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Resumes",
+      "item": [
+        {
+          "name": "Upload Resume (candidate)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/resumes/upload", "host": ["{{base_url}}"], "path": ["resumes","upload"] },
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "file", "type": "file", "src": "/path/to/your/resume.pdf", "description": "Upload PDF or DOCX resume" }]
+            }
+          }
+        },
+        {
+          "name": "My Resumes (candidate)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/resumes/mine", "host": ["{{base_url}}"], "path": ["resumes","mine"] }
+          }
+        },
+        {
+          "name": "Match Resume to Job (candidate)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/resumes/match/1", "host": ["{{base_url}}"], "path": ["resumes","match","1"] }
+          }
+        },
+        {
+          "name": "Get Candidate Resumes (recruiter)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/resumes/candidate/1", "host": ["{{base_url}}"], "path": ["resumes","candidate","1"] }
           }
         }
       ]
@@ -167,67 +180,44 @@
       "name": "Candidates",
       "item": [
         {
-          "name": "List All Candidates",
+          "name": "List All Candidates (recruiter)",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{base_url}}/candidates/", "host": ["{{base_url}}"], "path": ["candidates", ""] }
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/candidates/", "host": ["{{base_url}}"], "path": ["candidates",""] }
           }
         },
         {
-          "name": "List Candidates by Status - Applied",
+          "name": "My Candidate Profile",
           "request": {
             "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/candidates/?status=Applied",
-              "host": ["{{base_url}}"],
-              "path": ["candidates", ""],
-              "query": [{ "key": "status", "value": "Applied" }]
-            }
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/candidates/me", "host": ["{{base_url}}"], "path": ["candidates","me"] }
           }
         },
         {
-          "name": "List Candidates by Status - Interview",
+          "name": "Rank Candidates for Job (recruiter)",
           "request": {
             "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/candidates/?status=Interview",
-              "host": ["{{base_url}}"],
-              "path": ["candidates", ""],
-              "query": [{ "key": "status", "value": "Interview" }]
-            }
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/candidates/ranking/1", "host": ["{{base_url}}"], "path": ["candidates","ranking","1"] }
           }
         },
         {
-          "name": "Get Candidate by ID",
+          "name": "Get Candidate by ID (recruiter)",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{base_url}}/candidates/1", "host": ["{{base_url}}"], "path": ["candidates", "1"] }
-          }
-        },
-        {
-          "name": "Get Candidate by User ID",
-          "request": {
-            "method": "GET",
-            "url": { "raw": "{{base_url}}/candidates/user/1", "host": ["{{base_url}}"], "path": ["candidates", "user", "1"] }
-          }
-        },
-        {
-          "name": "Rank Candidates for Job",
-          "request": {
-            "method": "GET",
-            "url": { "raw": "{{base_url}}/candidates/ranking/1", "host": ["{{base_url}}"], "path": ["candidates", "ranking", "1"] }
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/candidates/1", "host": ["{{base_url}}"], "path": ["candidates","1"] }
           }
         },
         {
           "name": "Update Candidate Profile",
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/candidates/1", "host": ["{{base_url}}"], "path": ["candidates", "1"] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Alex Johnson\",\n  \"role\": \"Senior Software Engineer\",\n  \"experience\": 7,\n  \"education\": \"M.S. CS\",\n  \"skills\": [\"Python\", \"Go\", \"Kubernetes\", \"AWS\", \"PostgreSQL\"],\n  \"location\": \"San Francisco, CA\",\n  \"salary_exp\": 185000,\n  \"match_score\": 96.0\n}"
-            }
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/candidates/1", "host": ["{{base_url}}"], "path": ["candidates","1"] },
+            "body": { "mode": "raw", "raw": "{\n  \"experience\": 7,\n  \"education\": \"M.S. CS\",\n  \"skills\": [\"python\", \"go\", \"kubernetes\", \"aws\", \"postgresql\"],\n  \"location\": \"San Francisco, CA\",\n  \"salary_exp\": 185000\n}" }
           }
         }
       ]
@@ -236,84 +226,118 @@
       "name": "Applications",
       "item": [
         {
-          "name": "Apply to Job",
+          "name": "Apply to Job (candidate)",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/applications/", "host": ["{{base_url}}"], "path": ["applications", ""] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"candidate_id\": 1,\n  \"job_id\": 1\n}"
-            }
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/applications/", "host": ["{{base_url}}"], "path": ["applications",""] },
+            "body": { "mode": "raw", "raw": "{\n  \"job_id\": 1\n}" }
           }
         },
         {
-          "name": "Get Kanban Board",
+          "name": "My Applications (candidate)",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{base_url}}/applications/kanban", "host": ["{{base_url}}"], "path": ["applications", "kanban"] }
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/applications/mine", "host": ["{{base_url}}"], "path": ["applications","mine"] }
           }
         },
         {
-          "name": "Get Applications by Candidate",
+          "name": "Kanban Board (recruiter)",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{base_url}}/applications/candidate/1", "host": ["{{base_url}}"], "path": ["applications", "candidate", "1"] }
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/applications/kanban", "host": ["{{base_url}}"], "path": ["applications","kanban"] }
           }
         },
         {
-          "name": "Get Applications by Job",
+          "name": "Applications for a Job (recruiter)",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{base_url}}/applications/job/1", "host": ["{{base_url}}"], "path": ["applications", "job", "1"] }
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/applications/job/1", "host": ["{{base_url}}"], "path": ["applications","job","1"] }
           }
         },
         {
-          "name": "Update Application Status - Screening",
+          "name": "Update Status → Screening (recruiter)",
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/applications/1/status", "host": ["{{base_url}}"], "path": ["applications", "1", "status"] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"Screening\"\n}"
-            }
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/applications/1/status", "host": ["{{base_url}}"], "path": ["applications","1","status"] },
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"Screening\"\n}" }
           }
         },
         {
-          "name": "Update Application Status - Interview",
+          "name": "Update Status → Offer (recruiter)",
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/applications/1/status", "host": ["{{base_url}}"], "path": ["applications", "1", "status"] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"Interview\"\n}"
-            }
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/applications/1/status", "host": ["{{base_url}}"], "path": ["applications","1","status"] },
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"Offer\"\n}" }
           }
         },
         {
-          "name": "Update Application Status - Offer",
+          "name": "Update Status → Hired (recruiter)",
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/applications/1/status", "host": ["{{base_url}}"], "path": ["applications", "1", "status"] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"Offer\"\n}"
-            }
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/applications/1/status", "host": ["{{base_url}}"], "path": ["applications","1","status"] },
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"Hired\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Interviews",
+      "item": [
+        {
+          "name": "Schedule Interview (recruiter)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/interviews/", "host": ["{{base_url}}"], "path": ["interviews",""] },
+            "body": { "mode": "raw", "raw": "{\n  \"application_id\": 1,\n  \"scheduled_at\": \"2025-08-01T10:00:00\",\n  \"location\": \"Google Meet\",\n  \"notes\": \"Technical round — focus on system design and Python.\"\n}" }
           }
         },
         {
-          "name": "Update Application Status - Hired",
+          "name": "My Interviews (candidate)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/interviews/mine", "host": ["{{base_url}}"], "path": ["interviews","mine"] }
+          }
+        },
+        {
+          "name": "My Scheduled Interviews (recruiter)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/interviews/scheduled", "host": ["{{base_url}}"], "path": ["interviews","scheduled"] }
+          }
+        },
+        {
+          "name": "Interviews for a Job (recruiter)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/interviews/job/1", "host": ["{{base_url}}"], "path": ["interviews","job","1"] }
+          }
+        },
+        {
+          "name": "Update Interview (recruiter)",
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/applications/1/status", "host": ["{{base_url}}"], "path": ["applications", "1", "status"] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"Hired\"\n}"
-            }
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/interviews/1", "host": ["{{base_url}}"], "path": ["interviews","1"] },
+            "body": { "mode": "raw", "raw": "{\n  \"scheduled_at\": \"2025-08-05T14:00:00\",\n  \"location\": \"Zoom\",\n  \"notes\": \"Rescheduled — final round.\"\n}" }
+          }
+        },
+        {
+          "name": "Cancel Interview (recruiter)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/interviews/1", "host": ["{{base_url}}"], "path": ["interviews","1"] }
           }
         }
       ]
@@ -322,17 +346,19 @@
       "name": "Analytics",
       "item": [
         {
-          "name": "Get Admin Stats",
+          "name": "Admin Stats (admin only)",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{base_url}}/analytics/stats", "host": ["{{base_url}}"], "path": ["analytics", "stats"] }
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/analytics/stats", "host": ["{{base_url}}"], "path": ["analytics","stats"] }
           }
         },
         {
-          "name": "Get Pipeline Funnel",
+          "name": "Pipeline Funnel (recruiter/admin)",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{base_url}}/analytics/funnel", "host": ["{{base_url}}"], "path": ["analytics", "funnel"] }
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/analytics/funnel", "host": ["{{base_url}}"], "path": ["analytics","funnel"] }
           }
         }
       ]

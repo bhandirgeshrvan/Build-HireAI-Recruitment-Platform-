@@ -3,12 +3,14 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from database_config import get_db
 from controller import application_controller
+from controller.candidate_controller import get_candidate_by_user
+from core.dependencies import get_current_user, require_role
+from models.models import User
 
 router = APIRouter(prefix="/applications", tags=["Applications"])
 
 
 class ApplyRequest(BaseModel):
-    candidate_id: int
     job_id: int
 
 
@@ -16,26 +18,56 @@ class StatusUpdate(BaseModel):
     status: str
 
 
-@router.post("/")
-def apply(body: ApplyRequest, db: Session = Depends(get_db)):
-    return application_controller.apply_to_job(db, body.candidate_id, body.job_id)
+@router.post("/", summary="Apply to a job (candidate only)")
+def apply(
+    body: ApplyRequest,
+    current_user: User = Depends(require_role("candidate")),
+    db: Session = Depends(get_db),
+):
+    candidate = get_candidate_by_user(db, current_user.id)
+    return application_controller.apply_to_job(db, candidate.id, body.job_id)
 
 
-@router.get("/kanban")
-def kanban(db: Session = Depends(get_db)):
+@router.get("/kanban", summary="Kanban board grouped by pipeline stage (recruiter/admin only)")
+def kanban(
+    current_user: User = Depends(require_role("recruiter", "admin")),
+    db: Session = Depends(get_db),
+):
     return application_controller.get_kanban(db)
 
 
-@router.get("/candidate/{candidate_id}")
-def by_candidate(candidate_id: int, db: Session = Depends(get_db)):
+@router.get("/mine", summary="Get my applications (candidate only)")
+def my_applications(
+    current_user: User = Depends(require_role("candidate")),
+    db: Session = Depends(get_db),
+):
+    candidate = get_candidate_by_user(db, current_user.id)
+    return application_controller.get_applications_by_candidate(db, candidate.id)
+
+
+@router.get("/candidate/{candidate_id}", summary="Get applications by candidate ID (recruiter/admin only)")
+def by_candidate(
+    candidate_id: int,
+    current_user: User = Depends(require_role("recruiter", "admin")),
+    db: Session = Depends(get_db),
+):
     return application_controller.get_applications_by_candidate(db, candidate_id)
 
 
-@router.get("/job/{job_id}")
-def by_job(job_id: int, db: Session = Depends(get_db)):
+@router.get("/job/{job_id}", summary="Get applications for a job, sorted by match score (recruiter/admin only)")
+def by_job(
+    job_id: int,
+    current_user: User = Depends(require_role("recruiter", "admin")),
+    db: Session = Depends(get_db),
+):
     return application_controller.get_applications_by_job(db, job_id)
 
 
-@router.put("/{app_id}/status")
-def update_status(app_id: int, body: StatusUpdate, db: Session = Depends(get_db)):
+@router.put("/{app_id}/status", summary="Update application pipeline status (recruiter/admin only)")
+def update_status(
+    app_id: int,
+    body: StatusUpdate,
+    current_user: User = Depends(require_role("recruiter", "admin")),
+    db: Session = Depends(get_db),
+):
     return application_controller.update_application_status(db, app_id, body.status)

@@ -2,8 +2,18 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from passlib.context import CryptContext
 from models.models import User, Candidate, RoleEnum
+from core.jwt import create_access_token
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+def _token_response(user: User) -> dict:
+    token = create_access_token({"sub": user.id, "role": user.role, "email": user.email})
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": {"id": user.id, "name": user.name, "email": user.email, "role": user.role},
+    }
 
 
 def register_user(db: Session, name: str, email: str, password: str, role: str):
@@ -18,16 +28,19 @@ def register_user(db: Session, name: str, email: str, password: str, role: str):
     db.flush()
 
     if role == RoleEnum.candidate:
-        candidate = Candidate(user_id=user.id, name=name, email=email.lower(), status="Applied")
-        db.add(candidate)
+        db.add(Candidate(user_id=user.id, name=name, email=email.lower(), status="Applied"))
 
     db.commit()
     db.refresh(user)
-    return {"id": user.id, "name": user.name, "email": user.email, "role": user.role}
+    return _token_response(user)
 
 
 def login_user(db: Session, email: str, password: str):
     user = db.query(User).filter(User.email == email.lower()).first()
     if not user or not pwd_context.verify(password, user.password):
         raise HTTPException(status_code=401, detail="Invalid email or password.")
+    return _token_response(user)
+
+
+def get_me(user: User) -> dict:
     return {"id": user.id, "name": user.name, "email": user.email, "role": user.role}
