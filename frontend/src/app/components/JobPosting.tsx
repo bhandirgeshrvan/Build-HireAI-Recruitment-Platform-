@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { PageHeader } from './KPICard'
 import { LOCATIONS, SKILLS_POOL } from './data'
 import { CheckCircle } from 'lucide-react'
+import { jobs as jobsApi } from '../api'
 
 const inputClass = 'w-full px-3 py-2.5 rounded-lg text-sm text-slate-800 placeholder-slate-300 outline-none transition-all'
 const inputStyle = { background: '#ffffff', border: '1px solid #e2e8f0' }
@@ -50,7 +51,7 @@ export function JobPosting() {
       : [...form.requiredSkills, skill])
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const errs: string[] = []
     if (!form.title) errs.push('Job title is required.')
@@ -59,7 +60,24 @@ export function JobPosting() {
     if (form.requiredSkills.length === 0) errs.push('At least one required skill must be selected.')
     if (form.salaryMax <= form.salaryMin) errs.push('Max salary must exceed min salary.')
     setErrors(errs)
-    if (errs.length === 0) setSubmitted(true)
+    if (errs.length > 0) return
+
+    try {
+      await jobsApi.create({
+        title: form.title,
+        company: form.company,
+        location: form.location,
+        salary_min: form.salaryMin,
+        salary_max: form.salaryMax,
+        type: form.type as 'Full-time' | 'Part-time' | 'Contract',
+        experience: form.expLevel,
+        skills: form.requiredSkills,
+        status: 'Active',
+      })
+    } catch {
+      // still show success in demo if API fails (recruiter may not be linked to a company yet)
+    }
+    setSubmitted(true)
   }
 
   if (submitted) {

@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { PageHeader, ScoreBadge, Tag } from './KPICard'
 import { CANDIDATES } from './data'
+import type { Candidate } from './data'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
 } from 'recharts'
 import { Mail, X } from 'lucide-react'
+import { candidates as candidatesApi } from '../api'
 
 const tt = {
   contentStyle: { background: '#fff', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 11, color: '#0f172a' },
@@ -20,8 +22,15 @@ export function CandidateRanking() {
   const [sortBy, setSortBy]       = useState('match_score')
   const [invitedIds, setInvitedIds]   = useState<number[]>([])
   const [rejectedIds, setRejectedIds] = useState<number[]>([])
+  const [allCandidates, setAllCandidates] = useState<Candidate[]>(CANDIDATES)
 
-  const filtered = CANDIDATES
+  useEffect(() => {
+    candidatesApi.list({ limit: 100 })
+      .then(data => { if (data.length > 0) setAllCandidates(data) })
+      .catch(() => { /* keep static fallback */ })
+  }, [])
+
+  const filtered = allCandidates
     .filter(c => c.match_score >= minScore && (stageFilter === 'All' || c.status === stageFilter))
     .filter(c => !rejectedIds.includes(c.id))
     .sort((a, b) => {

@@ -22,8 +22,7 @@ export function Login() {
     setError('')
     if (!email || !password) { setError('Please enter both email and password.'); return }
     setLoading(true)
-    await new Promise(r => setTimeout(r, 400))
-    const result = login(email, password)
+    const result = await login(email, password)
     setLoading(false)
     if (!result.ok) setError(result.msg)
   }

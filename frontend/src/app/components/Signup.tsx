@@ -20,8 +20,7 @@ export function Signup() {
     setError(''); setSuccess('')
     if (password !== confirm) { setError('Passwords do not match.'); return }
     setLoading(true)
-    await new Promise(r => setTimeout(r, 400))
-    const result = signup(name, email, password, role)
+    const result = await signup(name, email, password, role)
     setLoading(false)
     if (!result.ok) { setError(result.msg); return }
     setSuccess(result.msg)

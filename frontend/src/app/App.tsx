@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
-import type { Role, User, DBUser } from './components/data'
-import { DEMO_USERS } from './components/data'
+import type { Role, User } from './components/data'
 import { Layout } from './components/Layout'
 import { Landing } from './components/Landing'
 import { Login } from './components/Login'
@@ -15,6 +14,7 @@ import { JobPosting } from './components/JobPosting'
 import { CandidateRanking } from './components/CandidateRanking'
 import { Analytics } from './components/Analytics'
 import { AdminDashboard } from './components/AdminDashboard'
+import { auth, token } from './api'
 
 // -- Page type
 export type Page =
@@ -34,8 +34,8 @@ const PUBLIC_ONLY: Page[] = ['landing', 'login', 'signup']
 // -- Auth context
 interface AuthCtx {
   user: User | null
-  login: (email: string, password: string) => { ok: boolean; msg: string }
-  signup: (name: string, email: string, password: string, role: Role) => { ok: boolean; msg: string }
+  login: (email: string, password: string) => Promise<{ ok: boolean; msg: string }>
+  signup: (name: string, email: string, password: string, role: Role) => Promise<{ ok: boolean; msg: string }>
   logout: () => void
 }
 export const AuthContext = createContext<AuthCtx>({} as AuthCtx)
@@ -45,9 +45,6 @@ export const useAuth = () => useContext(AuthContext)
 interface NavCtx { currentPage: Page; navigate: (p: Page) => void }
 export const NavContext = createContext<NavCtx>({} as NavCtx)
 export const useNav = () => useContext(NavContext)
-
-// -- Users DB (seeded from data.ts)
-const USERS_DB: Record<string, DBUser> = { ...DEMO_USERS }
 
 // -- Page renderer
 function PageRenderer({ page }: { page: Page }) {
@@ -71,9 +68,28 @@ function PageRenderer({ page }: { page: Page }) {
 export default function App() {
   const [user, setUser] = useState<User | null>(null)
   const [currentPage, setCurrentPage] = useState<Page>('landing')
+  const [bootstrapped, setBootstrapped] = useState(false)
 
   useEffect(() => {
     document.documentElement.classList.remove('dark')
+    // Restore session from token
+    const t = token.get()
+    if (t) {
+      auth.me()
+        .then(u => {
+          setUser({ name: u.name, email: u.email, role: u.role as Role })
+          const dash: Record<Role, Page> = {
+            candidate: 'candidate-dashboard',
+            recruiter: 'recruiter-dashboard',
+            admin:     'admin-dashboard',
+          }
+          setCurrentPage(dash[u.role as Role])
+        })
+        .catch(() => token.clear())
+        .finally(() => setBootstrapped(true))
+    } else {
+      setBootstrapped(true)
+    }
   }, [])
 
   const navigate = (page: Page) => {
@@ -84,32 +100,46 @@ export default function App() {
     setCurrentPage(page)
   }
 
-  const login = (email: string, password: string) => {
-    const u = USERS_DB[email.toLowerCase().trim()]
-    if (!u) return { ok: false, msg: 'No account found with that email.' }
-    if (u.password !== password) return { ok: false, msg: 'Incorrect password.' }
-    const newUser: User = { name: u.name, email: email.toLowerCase(), role: u.role }
-    setUser(newUser)
-    const dash: Record<Role, Page> = {
-      candidate: 'candidate-dashboard',
-      recruiter: 'recruiter-dashboard',
-      admin:     'admin-dashboard',
+  const login = async (email: string, password: string) => {
+    try {
+      const res = await auth.login(email, password)
+      token.set(res.access_token)
+      const me = await auth.me()
+      const newUser: User = { name: me.name, email: me.email, role: me.role as Role }
+      setUser(newUser)
+      const dash: Record<Role, Page> = {
+        candidate: 'candidate-dashboard',
+        recruiter: 'recruiter-dashboard',
+        admin:     'admin-dashboard',
+      }
+      setCurrentPage(dash[me.role as Role])
+      return { ok: true, msg: '' }
+    } catch (e: unknown) {
+      return { ok: false, msg: e instanceof Error ? e.message : 'Login failed.' }
     }
-    setCurrentPage(dash[u.role])
-    return { ok: true, msg: '' }
   }
 
-  const signup = (name: string, email: string, password: string, role: Role) => {
-    if (!name || !email || !password) return { ok: false, msg: 'All fields are required.' }
-    if (USERS_DB[email.toLowerCase()]) return { ok: false, msg: 'Email already registered.' }
-    if (password.length < 6) return { ok: false, msg: 'Password must be at least 6 characters.' }
-    USERS_DB[email.toLowerCase()] = { password, role, name }
-    return { ok: true, msg: 'Account created! You can now log in.' }
+  const signup = async (name: string, email: string, password: string, role: Role) => {
+    try {
+      await auth.register(name, email, password, role)
+      return { ok: true, msg: 'Account created! You can now log in.' }
+    } catch (e: unknown) {
+      return { ok: false, msg: e instanceof Error ? e.message : 'Signup failed.' }
+    }
   }
 
   const logout = () => {
+    token.clear()
     setUser(null)
     setCurrentPage('landing')
+  }
+
+  if (!bootstrapped) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-indigo-600 border-t-transparent animate-spin" />
+      </div>
+    )
   }
 
   const isPublicPage = PUBLIC_ONLY.includes(currentPage)

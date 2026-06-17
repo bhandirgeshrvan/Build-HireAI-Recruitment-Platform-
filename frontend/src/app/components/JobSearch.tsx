@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Search, MapPin, Briefcase, Clock, Users, DollarSign, Bookmark, Zap } from 'lucide-react'
 import { PageHeader, ScoreBadge, Tag } from './KPICard'
 import { JOBS, LOCATIONS } from './data'
 import type { Job } from './data'
+import { jobs as jobsApi } from '../api'
 
 const TYPE_COLORS: Record<string, string> = {
   'Full-time': '#6366f1',
@@ -73,8 +74,15 @@ export function JobSearch() {
   const [exp, setExp]         = useState('All')
   const [maxSal, setMaxSal]   = useState(300)
   const [sortBy, setSortBy]   = useState('match_score')
+  const [allJobs, setAllJobs] = useState<Job[]>(JOBS)
 
-  const filtered = JOBS
+  useEffect(() => {
+    jobsApi.list({ limit: 100 })
+      .then(data => { if (data.length > 0) setAllJobs(data) })
+      .catch(() => { /* keep static fallback */ })
+  }, [])
+
+  const filtered = allJobs
     .filter(j => {
       if (j.status !== 'Active') return false
       if (query && !j.title.toLowerCase().includes(query.toLowerCase()) &&
