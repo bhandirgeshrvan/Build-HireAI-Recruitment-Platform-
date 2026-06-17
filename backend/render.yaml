@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: hireai-backend
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_LINK
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "1440"
+      - key: CORS_ORIGINS
+        value: "https://build-hire-ai-recruitment-platform-chi.vercel.app,http://localhost:5173"
+      - key: UPLOAD_DIR
+        value: /tmp/uploads

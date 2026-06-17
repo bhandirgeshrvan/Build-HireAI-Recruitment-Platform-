@@ -2,12 +2,6 @@ import { useState } from 'react'
 import { Bot, Eye, EyeOff } from 'lucide-react'
 import { useAuth, useNav } from '../App'
 
-const DEMOS = [
-  { role: 'Candidate', email: 'candidate@hireai.com', color: '#6366f1' },
-  { role: 'Recruiter', email: 'recruiter@hireai.com', color: '#10b981' },
-  { role: 'Admin',     email: 'admin@hireai.com',     color: '#f59e0b' },
-]
-
 export function Login() {
   const { login } = useAuth()
   const { navigate } = useNav()
@@ -90,23 +84,6 @@ export function Login() {
               {loading ? 'Signing in…' : 'Sign In →'}
             </button>
           </form>
-        </div>
-
-        {/* Demo credentials */}
-        <div className="mt-4 rounded-xl p-4 bg-white shadow-sm" style={{ border: '1px solid #e2e8f0' }}>
-          <p className="text-xs font-semibold text-indigo-600 mb-3">⚡ Quick Demo Login</p>
-          <div className="space-y-2">
-            {DEMOS.map(d => (
-              <button key={d.role}
-                onClick={() => { setEmail(d.email); setPassword('demo123') }}
-                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs hover:bg-slate-50 transition-colors"
-                style={{ border: '1px solid #e2e8f0' }}>
-                <span className="font-semibold" style={{ color: d.color }}>{d.role}</span>
-                <span className="text-slate-400">{d.email}</span>
-              </button>
-            ))}
-          </div>
-          <p className="text-[10px] text-slate-400 mt-2 text-center">Password: demo123 · click a role to fill</p>
         </div>
 
         <p className="text-center text-xs text-slate-500 mt-4">
