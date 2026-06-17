@@ -1,0 +1,353 @@
+{
+  "info": {
+    "name": "HireAI Recruitment Platform",
+    "description": "Complete API collection for HireAI backend — Auth, Jobs, Candidates, Applications, Analytics.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register - Candidate",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alex Johnson\",\n  \"email\": \"alex.j@email.com\",\n  \"password\": \"demo123\",\n  \"role\": \"candidate\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register - Recruiter",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sarah Chen\",\n  \"email\": \"recruiter@hireai.com\",\n  \"password\": \"demo123\",\n  \"role\": \"recruiter\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register - Admin",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@hireai.com\",\n  \"password\": \"demo123\",\n  \"role\": \"admin\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alex.j@email.com\",\n  \"password\": \"demo123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login - Invalid Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alex.j@email.com\",\n  \"password\": \"wrongpassword\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Jobs",
+      "item": [
+        {
+          "name": "List All Jobs",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/jobs/", "host": ["{{base_url}}"], "path": ["jobs", ""] }
+          }
+        },
+        {
+          "name": "List Active Jobs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/jobs/?status=Active",
+              "host": ["{{base_url}}"],
+              "path": ["jobs", ""],
+              "query": [{ "key": "status", "value": "Active" }]
+            }
+          }
+        },
+        {
+          "name": "List Closed Jobs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/jobs/?status=Closed",
+              "host": ["{{base_url}}"],
+              "path": ["jobs", ""],
+              "query": [{ "key": "status", "value": "Closed" }]
+            }
+          }
+        },
+        {
+          "name": "Get Job by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/jobs/1", "host": ["{{base_url}}"], "path": ["jobs", "1"] }
+          }
+        },
+        {
+          "name": "Create Job",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/jobs/", "host": ["{{base_url}}"], "path": ["jobs", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Senior Software Engineer\",\n  \"company\": \"Stripe\",\n  \"location\": \"San Francisco, CA\",\n  \"salary_min\": 150000,\n  \"salary_max\": 220000,\n  \"type\": \"Full-time\",\n  \"experience\": \"5-8 yrs\",\n  \"skills\": [\"Python\", \"Go\", \"Kubernetes\"],\n  \"status\": \"Active\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Job",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/jobs/1", "host": ["{{base_url}}"], "path": ["jobs", "1"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"salary_max\": 230000,\n  \"status\": \"Active\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Close a Job",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/jobs/1", "host": ["{{base_url}}"], "path": ["jobs", "1"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Closed\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Job",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/jobs/1", "host": ["{{base_url}}"], "path": ["jobs", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Candidates",
+      "item": [
+        {
+          "name": "List All Candidates",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/candidates/", "host": ["{{base_url}}"], "path": ["candidates", ""] }
+          }
+        },
+        {
+          "name": "List Candidates by Status - Applied",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/candidates/?status=Applied",
+              "host": ["{{base_url}}"],
+              "path": ["candidates", ""],
+              "query": [{ "key": "status", "value": "Applied" }]
+            }
+          }
+        },
+        {
+          "name": "List Candidates by Status - Interview",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/candidates/?status=Interview",
+              "host": ["{{base_url}}"],
+              "path": ["candidates", ""],
+              "query": [{ "key": "status", "value": "Interview" }]
+            }
+          }
+        },
+        {
+          "name": "Get Candidate by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/candidates/1", "host": ["{{base_url}}"], "path": ["candidates", "1"] }
+          }
+        },
+        {
+          "name": "Get Candidate by User ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/candidates/user/1", "host": ["{{base_url}}"], "path": ["candidates", "user", "1"] }
+          }
+        },
+        {
+          "name": "Rank Candidates for Job",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/candidates/ranking/1", "host": ["{{base_url}}"], "path": ["candidates", "ranking", "1"] }
+          }
+        },
+        {
+          "name": "Update Candidate Profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/candidates/1", "host": ["{{base_url}}"], "path": ["candidates", "1"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alex Johnson\",\n  \"role\": \"Senior Software Engineer\",\n  \"experience\": 7,\n  \"education\": \"M.S. CS\",\n  \"skills\": [\"Python\", \"Go\", \"Kubernetes\", \"AWS\", \"PostgreSQL\"],\n  \"location\": \"San Francisco, CA\",\n  \"salary_exp\": 185000,\n  \"match_score\": 96.0\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Applications",
+      "item": [
+        {
+          "name": "Apply to Job",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/applications/", "host": ["{{base_url}}"], "path": ["applications", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"candidate_id\": 1,\n  \"job_id\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Kanban Board",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/applications/kanban", "host": ["{{base_url}}"], "path": ["applications", "kanban"] }
+          }
+        },
+        {
+          "name": "Get Applications by Candidate",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/applications/candidate/1", "host": ["{{base_url}}"], "path": ["applications", "candidate", "1"] }
+          }
+        },
+        {
+          "name": "Get Applications by Job",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/applications/job/1", "host": ["{{base_url}}"], "path": ["applications", "job", "1"] }
+          }
+        },
+        {
+          "name": "Update Application Status - Screening",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/applications/1/status", "host": ["{{base_url}}"], "path": ["applications", "1", "status"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Screening\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Application Status - Interview",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/applications/1/status", "host": ["{{base_url}}"], "path": ["applications", "1", "status"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Interview\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Application Status - Offer",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/applications/1/status", "host": ["{{base_url}}"], "path": ["applications", "1", "status"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Offer\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Application Status - Hired",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/applications/1/status", "host": ["{{base_url}}"], "path": ["applications", "1", "status"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Hired\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Get Admin Stats",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/analytics/stats", "host": ["{{base_url}}"], "path": ["analytics", "stats"] }
+          }
+        },
+        {
+          "name": "Get Pipeline Funnel",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/analytics/funnel", "host": ["{{base_url}}"], "path": ["analytics", "funnel"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Server Health",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/", "host": ["{{base_url}}"], "path": [""] }
+          }
+        }
+      ]
+    }
+  ]
+}

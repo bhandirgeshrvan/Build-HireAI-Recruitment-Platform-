@@ -1,0 +1,122 @@
+import { useState } from 'react'
+import { Bot, Eye, EyeOff } from 'lucide-react'
+import { useAuth, useNav } from '../App'
+
+const DEMOS = [
+  { role: 'Candidate', email: 'candidate@hireai.com', color: '#6366f1' },
+  { role: 'Recruiter', email: 'recruiter@hireai.com', color: '#10b981' },
+  { role: 'Admin',     email: 'admin@hireai.com',     color: '#f59e0b' },
+]
+
+export function Login() {
+  const { login } = useAuth()
+  const { navigate } = useNav()
+  const [email, setEmail]       = useState('')
+  const [password, setPassword] = useState('')
+  const [showPw, setShowPw]     = useState(false)
+  const [error, setError]       = useState('')
+  const [loading, setLoading]   = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    if (!email || !password) { setError('Please enter both email and password.'); return }
+    setLoading(true)
+    await new Promise(r => setTimeout(r, 400))
+    const result = login(email, password)
+    setLoading(false)
+    if (!result.ok) setError(result.msg)
+  }
+
+  const inputStyle = {
+    background: '#ffffff',
+    border: '1px solid #e2e8f0',
+    outline: 'none',
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-200">
+            <Bot size={22} className="text-white" />
+          </div>
+          <h1 className="text-xl font-bold text-slate-900">Welcome back</h1>
+          <p className="text-sm text-slate-500 mt-1">Sign in to your HireAI account</p>
+        </div>
+
+        {/* Card */}
+        <div className="rounded-2xl p-7 bg-white shadow-sm" style={{ border: '1px solid #e2e8f0' }}>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Email address</label>
+              <input
+                type="email" value={email} onChange={e => setEmail(e.target.value)}
+                placeholder="you@company.com"
+                className="w-full px-3 py-2.5 rounded-lg text-sm text-slate-800 placeholder-slate-300 transition-all"
+                style={inputStyle}
+                onFocus={e => (e.target.style.borderColor = '#6366f1')}
+                onBlur={e => (e.target.style.borderColor = '#e2e8f0')}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Password</label>
+              <div className="relative">
+                <input
+                  type={showPw ? 'text' : 'password'} value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-3 py-2.5 rounded-lg text-sm text-slate-800 placeholder-slate-300 transition-all pr-10"
+                  style={inputStyle}
+                  onFocus={e => (e.target as HTMLInputElement).style.borderColor = '#6366f1'}
+                  onBlur={e => (e.target as HTMLInputElement).style.borderColor = '#e2e8f0'}
+                />
+                <button type="button" onClick={() => setShowPw(!showPw)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                  {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
+                </button>
+              </div>
+            </div>
+
+            {error && (
+              <div className="text-xs text-red-600 px-3 py-2 rounded-lg bg-red-50 border border-red-100">
+                {error}
+              </div>
+            )}
+
+            <button type="submit" disabled={loading}
+              className="w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-60"
+              style={{ background: loading ? '#818cf8' : 'linear-gradient(135deg, #6366f1, #4f46e5)', boxShadow: '0 4px 14px rgba(99,102,241,0.3)' }}>
+              {loading ? 'Signing in…' : 'Sign In →'}
+            </button>
+          </form>
+        </div>
+
+        {/* Demo credentials */}
+        <div className="mt-4 rounded-xl p-4 bg-white shadow-sm" style={{ border: '1px solid #e2e8f0' }}>
+          <p className="text-xs font-semibold text-indigo-600 mb-3">⚡ Quick Demo Login</p>
+          <div className="space-y-2">
+            {DEMOS.map(d => (
+              <button key={d.role}
+                onClick={() => { setEmail(d.email); setPassword('demo123') }}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs hover:bg-slate-50 transition-colors"
+                style={{ border: '1px solid #e2e8f0' }}>
+                <span className="font-semibold" style={{ color: d.color }}>{d.role}</span>
+                <span className="text-slate-400">{d.email}</span>
+              </button>
+            ))}
+          </div>
+          <p className="text-[10px] text-slate-400 mt-2 text-center">Password: demo123 · click a role to fill</p>
+        </div>
+
+        <p className="text-center text-xs text-slate-500 mt-4">
+          Don't have an account?{' '}
+          <button onClick={() => navigate('signup')} className="text-indigo-600 hover:underline font-semibold">
+            Sign up
+          </button>
+        </p>
+      </div>
+    </div>
+  )
+}
