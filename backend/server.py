@@ -9,20 +9,8 @@ from router.application_router import router as application_router
 from router.resume_router import router as resume_router
 from router.interview_router import router as interview_router
 from router.analytics_router import router as analytics_router
-from dotenv import load_dotenv
-import os
 
 import models.models  # noqa — ensures all tables are registered with Base
-
-load_dotenv()
-
-# Comma-separated origins from env, with defaults
-_raw = os.getenv("CORS_ORIGINS", "")
-ALLOWED_ORIGINS = [o.strip() for o in _raw.split(",") if o.strip()] or [
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "https://build-hire-ai-recruitment-platform-chi.vercel.app",
-]
 
 app = FastAPI(
     title="HireAI Recruitment API",
@@ -32,8 +20,8 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
