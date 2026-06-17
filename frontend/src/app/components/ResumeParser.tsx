@@ -1,49 +1,9 @@
 import { useState } from 'react'
 import { Upload, FileText } from 'lucide-react'
 import { PageHeader, Tag } from './KPICard'
+import { SAMPLE_RESUME } from './data'
 
-const RESUME = {
-  name: 'Alex Johnson', email: 'alex.johnson@email.com',
-  phone: '+1 (555) 867-5309', location: 'San Francisco, CA',
-  summary: 'Senior Software Engineer with 7+ years of experience building scalable distributed systems. Passionate about ML infrastructure and developer tooling.',
-  score: 87,
-  breakdown: [
-    { label: 'Skills Match',          val: 92 },
-    { label: 'Experience Relevance',  val: 88 },
-    { label: 'Education Fit',         val: 75 },
-    { label: 'Resume Formatting',     val: 85 },
-    { label: 'Keywords Optimisation', val: 78 },
-  ],
-  skills: {
-    technical: ['Python', 'Go', 'Kubernetes', 'AWS', 'PostgreSQL', 'Redis', 'Kafka', 'Docker', 'Terraform'],
-    soft:      ['Leadership', 'Communication', 'Problem Solving', 'Agile', 'Mentoring'],
-  },
-  experience: [
-    {
-      title: 'Senior Software Engineer', company: 'Stripe', dates: 'Jan 2021 – Present',
-      bullets: [
-        'Led migration of payment pipeline to event-driven architecture (Kafka), reducing latency by 40%.',
-        'Mentored 4 junior engineers and conducted 50+ technical interviews.',
-        'Designed multi-region failover system with 99.99% uptime for $2B/day transactions.',
-      ],
-    },
-    {
-      title: 'Software Engineer', company: 'Airbnb', dates: 'Jun 2018 – Dec 2020',
-      bullets: [
-        'Built and maintained search ranking service serving 50M requests/day.',
-        'Reduced infrastructure cost by 30% via spot-instance auto-scaling on AWS.',
-      ],
-    },
-  ],
-  education: [
-    { degree: 'M.S. Computer Science', school: 'Stanford University', year: '2018', gpa: '3.9' },
-    { degree: 'B.S. Computer Science', school: 'UC Berkeley',          year: '2016', gpa: '3.7' },
-  ],
-  certifications: [
-    'AWS Solutions Architect – Professional',
-    'Certified Kubernetes Administrator (CKA)',
-  ],
-}
+const RESUME = SAMPLE_RESUME
 
 type TabKey = 'skills' | 'experience' | 'education' | 'certs'
 const TABS: { key: TabKey; label: string }[] = [
@@ -171,7 +131,7 @@ export function ResumeParser() {
                 <div className="space-y-4">
                   {RESUME.experience.map(exp => (
                     <div key={exp.title} className="rounded-lg p-4 bg-slate-50"
-                      style={{ borderLeft: '3px solid #6366f1', border: '1px solid #e2e8f0', borderLeft: '3px solid #6366f1' }}>
+                      style={{ border: '1px solid #e2e8f0', borderLeft: '3px solid #6366f1' }}>
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <p className="text-sm font-bold text-slate-900">{exp.title}</p>

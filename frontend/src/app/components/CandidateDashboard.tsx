@@ -2,22 +2,7 @@ import { useState } from 'react'
 import { Upload, Briefcase, Calendar, Star, Eye, ChevronRight } from 'lucide-react'
 import { useAuth, useNav } from '../App'
 import { KPICard, PageHeader, Tag, ScoreBadge } from './KPICard'
-import { JOBS } from './data'
-
-const INTERVIEWS = [
-  { company: 'Stripe',   role: 'Senior SWE',    time: 'Tomorrow, 2:00 PM',   color: '#10b981' },
-  { company: 'Shopify',  role: 'Backend Eng.',   time: 'Thu, Jun 20 @ 10 AM', color: '#6366f1' },
-  { company: 'Airbnb',   role: 'Full Stack Dev', time: 'Fri, Jun 21 @ 3 PM',  color: '#8b5cf6' },
-  { company: 'Netflix',  role: 'Platform Eng.',  time: 'Pending Schedule',     color: '#f59e0b' },
-]
-
-const PROFILE_TODOS = [
-  { done: true,  label: 'Work experience added' },
-  { done: true,  label: 'Skills listed' },
-  { done: true,  label: 'Education filled' },
-  { done: false, label: 'Upload resume' },
-  { done: false, label: 'Add portfolio link' },
-]
+import { JOBS, INTERVIEWS, PROFILE_TODOS } from './data'
 
 const card = 'bg-white rounded-xl p-5'
 const cardStyle = { border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }

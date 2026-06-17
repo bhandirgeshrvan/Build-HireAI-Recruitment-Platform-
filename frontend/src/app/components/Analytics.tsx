@@ -6,7 +6,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell, Funnel, FunnelChart, LabelList,
 } from 'recharts'
-import { MONTHLY_DATA, FUNNEL_DATA, SOURCES_DATA, TIME_TO_HIRE, SUCCESS_RATE } from './data'
+import { MONTHLY_DATA, FUNNEL_DATA, SOURCES_DATA, TIME_TO_HIRE, SUCCESS_RATE, DIVERSITY_STATS } from './data'
 
 const tt = {
   contentStyle: { background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 11, color: '#0f172a' },
@@ -158,14 +158,9 @@ export function Analytics() {
       <div className={card} style={cardStyle}>
         <p className="text-xs font-bold text-slate-700 mb-4">🌍 Diversity & Inclusion</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[
-            { label: 'Gender Balance',   val: '48% / 52%', sub: 'Female / Male',        color: '#6366f1' },
-            { label: 'Underrepresented', val: '34%',        sub: 'of new hires',          color: '#8b5cf6' },
-            { label: 'Remote Hires',     val: '61%',        sub: 'of total hires',        color: '#10b981' },
-            { label: 'Referral Hires',   val: '22%',        sub: 'via employee referral', color: '#f59e0b' },
-          ].map(d => (
+          {DIVERSITY_STATS.map(d => (
             <div key={d.label} className="rounded-lg p-3 text-center bg-slate-50"
-              style={{ borderLeft: `3px solid ${d.color}`, border: '1px solid #e2e8f0', borderLeft: `3px solid ${d.color}` }}>
+              style={{ border: '1px solid #e2e8f0', borderLeft: `3px solid ${d.color}` }}>
               <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">{d.label}</p>
               <p className="text-lg font-bold" style={{ color: d.color }}>{d.val}</p>
               <p className="text-[9px] text-slate-400 mt-0.5">{d.sub}</p>

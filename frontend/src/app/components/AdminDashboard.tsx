@@ -5,27 +5,13 @@ import {
   AreaChart, Area, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
-import { ADMIN_STATS, MONTHLY_DATA, CANDIDATES, JOBS } from './data'
+import { ADMIN_STATS, MONTHLY_DATA, CANDIDATES, JOBS, SUBSCRIPTION_TIERS, HEALTH_METRICS } from './data'
 import { useState } from 'react'
 
 const tt = {
   contentStyle: { background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 11, color: '#0f172a' },
   labelStyle: { color: '#64748b' },
 }
-
-const SUBSCRIPTION_TIERS = [
-  { tier: 'Free',       users: 1842, price: '$0/mo',   color: '#94a3b8' },
-  { tier: 'Starter',    users: 896,  price: '$49/mo',  color: '#6366f1' },
-  { tier: 'Growth',     users: 312,  price: '$149/mo', color: '#8b5cf6' },
-  { tier: 'Enterprise', users: 92,   price: '$499/mo', color: '#f59e0b' },
-]
-
-const HEALTH_METRICS = [
-  { label: 'API Uptime',        value: '99.98%', pct: 99.98, color: '#10b981' },
-  { label: 'Avg Response Time', value: '142 ms', pct: 85,    color: '#6366f1' },
-  { label: 'DB CPU Usage',      value: '34%',    pct: 34,    color: '#f59e0b' },
-  { label: 'Error Rate',        value: '0.02%',  pct: 2,     color: '#10b981' },
-]
 
 const QUICK_ACTIONS = [
   { label: 'Send Announcement', icon: <Users size={13} />,     msg: '📢 Announcement queued!',          color: '#6366f1' },

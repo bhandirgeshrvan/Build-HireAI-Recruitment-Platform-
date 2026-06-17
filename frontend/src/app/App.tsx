@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
-import type { Role, User } from './components/data'
+import type { Role, User, DBUser } from './components/data'
+import { DEMO_USERS } from './components/data'
 import { Layout } from './components/Layout'
 import { Landing } from './components/Landing'
 import { Login } from './components/Login'
@@ -15,7 +16,7 @@ import { CandidateRanking } from './components/CandidateRanking'
 import { Analytics } from './components/Analytics'
 import { AdminDashboard } from './components/AdminDashboard'
 
-// ── Page type ─────────────────────────────────────────────────────────────
+// -- Page type
 export type Page =
   | 'landing' | 'login' | 'signup'
   | 'candidate-dashboard' | 'resume-parser' | 'job-search' | 'application-tracking'
@@ -30,7 +31,7 @@ const PROTECTED: Page[] = [
 
 const PUBLIC_ONLY: Page[] = ['landing', 'login', 'signup']
 
-// ── Auth context ──────────────────────────────────────────────────────────
+// -- Auth context
 interface AuthCtx {
   user: User | null
   login: (email: string, password: string) => { ok: boolean; msg: string }
@@ -40,20 +41,15 @@ interface AuthCtx {
 export const AuthContext = createContext<AuthCtx>({} as AuthCtx)
 export const useAuth = () => useContext(AuthContext)
 
-// ── Nav context ───────────────────────────────────────────────────────────
+// -- Nav context
 interface NavCtx { currentPage: Page; navigate: (p: Page) => void }
 export const NavContext = createContext<NavCtx>({} as NavCtx)
 export const useNav = () => useContext(NavContext)
 
-// ── Fake users DB ─────────────────────────────────────────────────────────
-type DBUser = { password: string; role: Role; name: string }
-const USERS_DB: Record<string, DBUser> = {
-  'candidate@hireai.com': { password: 'demo123', role: 'candidate', name: 'Alex Johnson' },
-  'recruiter@hireai.com': { password: 'demo123', role: 'recruiter', name: 'Sarah Chen' },
-  'admin@hireai.com':     { password: 'demo123', role: 'admin',     name: 'Admin User' },
-}
+// -- Users DB (seeded from data.ts)
+const USERS_DB: Record<string, DBUser> = { ...DEMO_USERS }
 
-// ── Page renderer ─────────────────────────────────────────────────────────
+// -- Page renderer
 function PageRenderer({ page }: { page: Page }) {
   switch (page) {
     case 'landing':               return <Landing />
@@ -76,7 +72,6 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null)
   const [currentPage, setCurrentPage] = useState<Page>('landing')
 
-  // Ensure light mode
   useEffect(() => {
     document.documentElement.classList.remove('dark')
   }, [])

@@ -2,31 +2,7 @@ import { useNav, useAuth } from '../App'
 import { KPICard, PageHeader } from './KPICard'
 import { Briefcase, Users, Calendar, TrendingUp, PlusCircle } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { JOBS } from './data'
-
-const WEEKLY = [
-  { day: 'Mon', apps: 42 }, { day: 'Tue', apps: 58 },
-  { day: 'Wed', apps: 51 }, { day: 'Thu', apps: 73 },
-  { day: 'Fri', apps: 67 }, { day: 'Sat', apps: 29 },
-  { day: 'Sun', apps: 18 },
-]
-const DEPT_HIRES = [
-  { dept: 'Eng', hires: 8 }, { dept: 'Product', hires: 3 },
-  { dept: 'Design', hires: 2 }, { dept: 'Sales', hires: 4 }, { dept: 'Data', hires: 2 },
-]
-const SCHEDULE = [
-  { time: '10:00 AM', name: 'Alex Johnson',  role: 'Senior SWE',     round: 'Technical Round', color: '#6366f1' },
-  { time: '11:30 AM', name: 'Maria Garcia',  role: 'Data Scientist',  round: 'Final Round',     color: '#10b981' },
-  { time: '02:00 PM', name: 'James Wilson',  role: 'DevOps Engineer', round: 'Technical Round', color: '#8b5cf6' },
-  { time: '04:00 PM', name: 'Sarah Chen',    role: 'PM',              round: 'Culture Fit',     color: '#f59e0b' },
-]
-const FUNNEL = [
-  { stage: 'Applied', count: 387, color: '#6366f1' },
-  { stage: 'Screened', count: 210, color: '#8b5cf6' },
-  { stage: 'Interview', count: 86, color: '#f59e0b' },
-  { stage: 'Offer', count: 28, color: '#10b981' },
-  { stage: 'Hired', count: 19, color: '#22c55e' },
-]
+import { JOBS, WEEKLY_APPLICATIONS, DEPT_HIRES, RECRUITER_FUNNEL, TODAY_SCHEDULE } from './data'
 const tt = {
   contentStyle: { background: '#fff', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 11, color: '#0f172a' },
   labelStyle: { color: '#64748b' },
@@ -52,7 +28,7 @@ export function RecruiterDashboard() {
 
       {/* Pipeline */}
       <div className="grid grid-cols-5 gap-3">
-        {FUNNEL.map(s => (
+        {RECRUITER_FUNNEL.map(s => (
           <div key={s.stage} className="rounded-xl p-3 text-center bg-white"
             style={{ border: '1px solid #e2e8f0', borderTop: `3px solid ${s.color}`, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
             <div className="text-xl font-bold" style={{ color: s.color }}>{s.count}</div>
@@ -66,7 +42,7 @@ export function RecruiterDashboard() {
         <div className={`${card} p-5`} style={cardStyle}>
           <p className="text-xs font-bold text-slate-700 mb-4">📊 Applications This Week</p>
           <ResponsiveContainer width="100%" height={180}>
-            <BarChart data={WEEKLY} barCategoryGap="35%">
+            <BarChart data={WEEKLY_APPLICATIONS} barCategoryGap="35%">
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
               <XAxis dataKey="day" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} />
@@ -127,7 +103,7 @@ export function RecruiterDashboard() {
       <div className={`${card} p-5`} style={cardStyle}>
         <p className="text-sm font-bold text-slate-900 mb-4">📅 Today's Interviews</p>
         <div className="space-y-2">
-          {SCHEDULE.map((s, i) => (
+          {TODAY_SCHEDULE.map((s, i) => (
             <div key={i} className="flex items-center justify-between px-4 py-2.5 rounded-lg bg-slate-50"
               style={{ border: '1px solid #e2e8f0' }}>
               <div className="flex items-center gap-4">
