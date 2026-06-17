@@ -1,39 +1,7 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, ARRAY, Enum as PgEnum
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, ARRAY
 from sqlalchemy.orm import relationship
 from datetime import datetime
-import enum
 from database_config import Base
-
-
-class RoleEnum(str, enum.Enum):
-    candidate = "candidate"
-    recruiter = "recruiter"
-    admin = "admin"
-
-
-class StatusEnum(str, enum.Enum):
-    Applied = "Applied"
-    Screening = "Screening"
-    Interview = "Interview"
-    Offer = "Offer"
-    Hired = "Hired"
-
-
-class JobStatusEnum(str, enum.Enum):
-    Active = "Active"
-    Closed = "Closed"
-
-
-class JobTypeEnum(str, enum.Enum):
-    full_time = "Full-time"
-    part_time = "Part-time"
-    contract = "Contract"
-
-
-class InterviewStatusEnum(str, enum.Enum):
-    Scheduled = "Scheduled"
-    Completed = "Completed"
-    Cancelled = "Cancelled"
 
 
 # ── User ──────────────────────────────────────────────────────────────────
@@ -44,7 +12,7 @@ class User(Base):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
-    role = Column(PgEnum(RoleEnum, name="roleenum"), nullable=False)
+    role = Column(String, nullable=False)  # candidate | recruiter | admin
 
     candidate = relationship("Candidate", back_populates="user", uselist=False)
     jobs_posted = relationship("Job", back_populates="recruiter")
@@ -61,13 +29,13 @@ class Job(Base):
     location = Column(String)
     salary_min = Column(Integer)
     salary_max = Column(Integer)
-    type = Column(PgEnum(JobTypeEnum, name="jobtypeenum"))
+    type = Column(String)               # Full-time | Part-time | Contract
     experience = Column(String)
     skills = Column(ARRAY(String))
     posted_days = Column(Integer, default=0)
     applicants = Column(Integer, default=0)
     match_score = Column(Float, default=0)
-    status = Column(PgEnum(JobStatusEnum, name="jobstatusenum"), default=JobStatusEnum.Active)
+    status = Column(String, default="Active")   # Active | Closed
     created_at = Column(DateTime, default=datetime.utcnow)
 
     recruiter = relationship("User", back_populates="jobs_posted")
@@ -89,7 +57,7 @@ class Candidate(Base):
     skills = Column(ARRAY(String))
     match_score = Column(Float, default=0)
     location = Column(String)
-    status = Column(PgEnum(StatusEnum, name="statusenum"), default=StatusEnum.Applied)
+    status = Column(String, default="Applied")  # Applied | Screening | Interview | Offer | Hired
     salary_exp = Column(Integer)
     resume_path = Column(String, nullable=True)
 
@@ -121,7 +89,7 @@ class Application(Base):
     id = Column(Integer, primary_key=True, index=True)
     candidate_id = Column(Integer, ForeignKey("candidates.id"))
     job_id = Column(Integer, ForeignKey("jobs.id"))
-    status = Column(PgEnum(StatusEnum, name="statusenum"), default=StatusEnum.Applied)
+    status = Column(String, default="Applied")  # Applied | Screening | Interview | Offer | Hired
     score = Column(Float, default=0)
     matched_skills = Column(ARRAY(String), default=[])
     missing_skills = Column(ARRAY(String), default=[])
@@ -144,7 +112,7 @@ class Interview(Base):
     scheduled_at = Column(DateTime, nullable=False)
     location = Column(String)
     notes = Column(String)
-    status = Column(PgEnum(InterviewStatusEnum, name="interviewstatusenum"), default=InterviewStatusEnum.Scheduled)
+    status = Column(String, default="Scheduled")  # Scheduled | Completed | Cancelled
     created_at = Column(DateTime, default=datetime.utcnow)
 
     application = relationship("Application", back_populates="interviews")

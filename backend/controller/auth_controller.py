@@ -1,10 +1,12 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from passlib.context import CryptContext
-from models.models import User, Candidate, RoleEnum
+from models.models import User, Candidate
 from core.jwt import create_access_token
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+VALID_ROLES = {"candidate", "recruiter", "admin"}
 
 
 def _token_response(user: User) -> dict:
@@ -17,6 +19,8 @@ def _token_response(user: User) -> dict:
 
 
 def register_user(db: Session, name: str, email: str, password: str, role: str):
+    if role not in VALID_ROLES:
+        raise HTTPException(status_code=400, detail=f"Invalid role. Must be one of: {', '.join(VALID_ROLES)}")
     if db.query(User).filter(User.email == email.lower()).first():
         raise HTTPException(status_code=400, detail="Email already registered.")
     if len(password) < 6:
@@ -27,7 +31,7 @@ def register_user(db: Session, name: str, email: str, password: str, role: str):
     db.add(user)
     db.flush()
 
-    if role == RoleEnum.candidate:
+    if role == "candidate":
         db.add(Candidate(user_id=user.id, name=name, email=email.lower(), status="Applied"))
 
     db.commit()
