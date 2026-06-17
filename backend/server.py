@@ -29,6 +29,12 @@ app.add_middleware(
 
 @app.on_event("startup")
 def create_tables():
+    from sqlalchemy import text
+    with engine.connect() as conn:
+        # Drop legacy PG enum types that conflict with new String columns
+        for enum_name in ["roleenum", "statusenum", "jobstatusenum", "jobtypeenum", "interviewstatusenum"]:
+            conn.execute(text(f"DROP TYPE IF EXISTS {enum_name} CASCADE"))
+        conn.commit()
     Base.metadata.create_all(bind=engine)
 
 
