@@ -12,7 +12,10 @@ def _hash(password: str) -> str:
 
 
 def _verify(password: str, hashed: str) -> bool:
-    return bcrypt.checkpw(password.encode(), hashed.encode())
+    # Support both bcrypt hashed and plain text passwords
+    if hashed.startswith("$2b$") or hashed.startswith("$2a$"):
+        return bcrypt.checkpw(password.encode(), hashed.encode())
+    return password == hashed
 
 
 def _token_response(user: User) -> dict:
