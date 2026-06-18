@@ -31,13 +31,13 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 // ── Auth ───────────────────────────────────────────────────────────────────
 export const auth = {
   login: (email: string, password: string) =>
-    request<{ access_token: string; token_type: string }>('/auth/login', {
+    request<{ access_token: string; token_type: string; user: { id: number; name: string; email: string; role: string } }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
 
   register: (name: string, email: string, password: string, role: string) =>
-    request<{ id: number; name: string; email: string; role: string }>('/auth/register', {
+    request<{ access_token: string; token_type: string; user: { id: number; name: string; email: string; role: string } }>('/auth/register', {
       method: 'POST',
       body: JSON.stringify({ name, email, password, role }),
     }),

@@ -72,7 +72,7 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.classList.remove('dark')
-    // Restore session from token
+    // Restore session — only if token exists, use /auth/me to validate
     const t = token.get()
     if (t) {
       auth.me()
@@ -85,7 +85,10 @@ export default function App() {
           }
           setCurrentPage(dash[u.role as Role])
         })
-        .catch(() => token.clear())
+        .catch(() => {
+          token.clear()
+          setCurrentPage('login')
+        })
         .finally(() => setBootstrapped(true))
     } else {
       setBootstrapped(true)
@@ -104,15 +107,16 @@ export default function App() {
     try {
       const res = await auth.login(email, password)
       token.set(res.access_token)
-      const me = await auth.me()
-      const newUser: User = { name: me.name, email: me.email, role: me.role as Role }
+      // Use user data returned directly from login response
+      const u = res.user
+      const newUser: User = { name: u.name, email: u.email, role: u.role as Role }
       setUser(newUser)
       const dash: Record<Role, Page> = {
         candidate: 'candidate-dashboard',
         recruiter: 'recruiter-dashboard',
         admin:     'admin-dashboard',
       }
-      setCurrentPage(dash[me.role as Role])
+      setCurrentPage(dash[u.role as Role])
       return { ok: true, msg: '' }
     } catch (e: unknown) {
       return { ok: false, msg: e instanceof Error ? e.message : 'Login failed.' }
