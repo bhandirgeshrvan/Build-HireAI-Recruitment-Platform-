@@ -51,31 +51,6 @@ def render() -> None:
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        # Demo credentials
-        st.markdown("""
-        <div style="background:#0f1629;border:1px solid #1e3a5f;
-                    border-radius:12px;padding:16px;font-size:0.82rem;">
-            <p style="color:#60a5fa;font-weight:600;margin:0 0 8px;">
-                🔐 Demo Credentials
-            </p>
-            <table style="width:100%;border-collapse:collapse;color:#94a3b8;">
-                <tr>
-                    <td style="padding:3px 0;"><b style="color:#f1f5f9;">Candidate</b></td>
-                    <td>candidate@hireai.com / demo123</td>
-                </tr>
-                <tr>
-                    <td style="padding:3px 0;"><b style="color:#f1f5f9;">Recruiter</b></td>
-                    <td>recruiter@hireai.com / demo123</td>
-                </tr>
-                <tr>
-                    <td style="padding:3px 0;"><b style="color:#f1f5f9;">Admin</b></td>
-                    <td>admin@hireai.com / demo123</td>
-                </tr>
-            </table>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown("<br>", unsafe_allow_html=True)
         _, btn_col, _ = st.columns([1, 2, 1])
         with btn_col:
             if st.button("Don't have an account? Sign up", use_container_width=True):
