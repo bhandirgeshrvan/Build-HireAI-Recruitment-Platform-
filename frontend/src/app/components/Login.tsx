@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { Bot, Eye, EyeOff } from 'lucide-react'
 import { useAuth, useNav } from '../App'
+import type { Role } from './data'
 
 export function Login() {
   const { login } = useAuth()
   const { navigate } = useNav()
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
+  const [role, setRole]         = useState<Role>('candidate')
   const [showPw, setShowPw]     = useState(false)
   const [error, setError]       = useState('')
   const [loading, setLoading]   = useState(false)
@@ -42,6 +44,25 @@ export function Login() {
         {/* Card */}
         <div className="rounded-2xl p-7 bg-white shadow-sm" style={{ border: '1px solid #e2e8f0' }}>
           <form onSubmit={handleSubmit} className="space-y-4">
+
+            {/* Role selector */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-2">I am a…</label>
+              <div className="grid grid-cols-2 gap-3">
+                {(['candidate', 'recruiter'] as Role[]).map(r => (
+                  <button key={r} type="button" onClick={() => setRole(r)}
+                    className="py-3 rounded-xl text-xs font-semibold transition-all"
+                    style={{
+                      background: role === r ? '#eef2ff' : '#ffffff',
+                      border: `1px solid ${role === r ? '#6366f1' : '#e2e8f0'}`,
+                      color: role === r ? '#4f46e5' : '#64748b',
+                    }}>
+                    {r === 'candidate' ? '👤 Job Seeker' : '💼 Recruiter'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1.5">Email address</label>
               <input
@@ -53,6 +74,7 @@ export function Login() {
                 onBlur={e => (e.target.style.borderColor = '#e2e8f0')}
               />
             </div>
+
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1.5">Password</label>
               <div className="relative">
