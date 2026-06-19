@@ -74,10 +74,10 @@ export function JobPosting() {
         skills: form.requiredSkills,
         status: 'Active',
       })
-    } catch {
-      // still show success in demo if API fails (recruiter may not be linked to a company yet)
+      setSubmitted(true)
+    } catch (e: unknown) {
+      setErrors([e instanceof Error ? e.message : 'Failed to post job. Please try again.'])
     }
-    setSubmitted(true)
   }
 
   if (submitted) {

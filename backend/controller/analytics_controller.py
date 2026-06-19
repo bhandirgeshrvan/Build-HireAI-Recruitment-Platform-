@@ -4,6 +4,7 @@ from models.models import User, Job, Candidate, Application
 
 
 def get_admin_stats(db: Session):
+    from models.models import Interview
     total_users = db.query(User).count()
     recruiters = db.query(User).filter(User.role == "recruiter").count()
     candidates = db.query(User).filter(User.role == "candidate").count()
@@ -11,6 +12,7 @@ def get_admin_stats(db: Session):
     active_jobs = db.query(Job).filter(Job.status == "Active").count()
     applications = db.query(Application).count()
     hires = db.query(Application).filter(Application.status == "Hired").count()
+    total_interviews = db.query(Interview).count()
 
     return {
         "total_users": total_users,
@@ -20,6 +22,7 @@ def get_admin_stats(db: Session):
         "active_jobs": active_jobs,
         "applications": applications,
         "hires": hires,
+        "total_interviews": total_interviews,
     }
 
 
