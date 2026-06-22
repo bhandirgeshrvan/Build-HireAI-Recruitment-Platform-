@@ -1,11 +1,20 @@
-INFO:     Started server process [5904]
+INFO:     Will watch for changes in these directories: ['/home/ideabliss/Hiring-platform/Build-HireAI-Recruitment-Platform-/backend']
+ERROR:    [Errno 98] Address already in use
+INFO:     Will watch for changes in these directories: ['/home/ideabliss/Hiring-platform/Build-HireAI-Recruitment-Platform-/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [89770] using WatchFiles
+INFO:     Started server process [89772]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-INFO:     127.0.0.1:52523 - "GET / HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52523 - "GET / HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52523 - "GET / HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52523 - "GET / HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52523 - "GET / HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52523 - "GET / HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52523 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34864 - "POST /resumes/ats-check HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45136 - "OPTIONS /jobs?status=Active HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45150 - "OPTIONS /interviews/mine HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45162 - "OPTIONS /applications/mine HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45164 - "OPTIONS /candidates/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45150 - "GET /jobs?status=Active HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:45150 - "OPTIONS /jobs/?status=Active HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45166 - "GET /applications/mine HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45164 - "GET /jobs/?status=Active HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45136 - "GET /candidates/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45162 - "GET /interviews/mine HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48124 - "POST /resumes/ats-check HTTP/1.1" 200 OK

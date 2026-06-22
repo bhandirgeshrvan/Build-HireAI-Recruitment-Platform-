@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bot } from 'lucide-react'
+import { Bot, User, Briefcase } from 'lucide-react'
 import { useAuth, useNav } from '../App'
 import type { Role } from './data'
 
@@ -84,13 +84,17 @@ export function Signup() {
                 <div className="grid grid-cols-2 gap-3">
                   {(['candidate', 'recruiter'] as Role[]).map(r => (
                     <button key={r} type="button" onClick={() => setRole(r)}
-                      className="py-3 rounded-xl text-xs font-semibold transition-all"
+                      className="py-3 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2"
                       style={{
                         background: role === r ? '#eef2ff' : '#ffffff',
                         border: `1px solid ${role === r ? '#6366f1' : '#e2e8f0'}`,
                         color: role === r ? '#4f46e5' : '#64748b',
                       }}>
-                      {r === 'candidate' ? '👤 Job Seeker' : '💼 Recruiter'}
+                      {r === 'candidate' ? (
+                        <><User size={14} /> Job Seeker</>
+                      ) : (
+                        <><Briefcase size={14} /> Recruiter</>
+                      )}
                     </button>
                   ))}
                 </div>

@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer
+from sqlalchemy import inspect
 from database_config import engine, Base
 from router.auth_router import router as auth_router
 from router.job_router import router as job_router
@@ -36,6 +37,32 @@ def create_tables():
             conn.execute(text(f"DROP TYPE IF EXISTS {enum_name} CASCADE"))
         conn.commit()
     Base.metadata.create_all(bind=engine)
+    inspector = inspect(engine)
+    
+    # Add missing columns to resumes table
+    if "resumes" in inspector.get_table_names():
+        resume_columns = {column["name"] for column in inspector.get_columns("resumes")}
+        with engine.begin() as conn:
+            if "parsed_profile" not in resume_columns:
+                conn.execute(text("ALTER TABLE resumes ADD COLUMN parsed_profile JSON"))
+                print("✓ Added parsed_profile column")
+            if "structured_data" not in resume_columns:
+                conn.execute(text("ALTER TABLE resumes ADD COLUMN structured_data TEXT"))
+                print("✓ Added structured_data column")
+    
+    # Add missing columns to candidates table
+    if "candidates" in inspector.get_table_names():
+        candidate_columns = {column["name"] for column in inspector.get_columns("candidates")}
+        with engine.begin() as conn:
+            if "phone" not in candidate_columns:
+                conn.execute(text("ALTER TABLE candidates ADD COLUMN phone VARCHAR"))
+                print("✓ Added phone column")
+            if "linkedin" not in candidate_columns:
+                conn.execute(text("ALTER TABLE candidates ADD COLUMN linkedin VARCHAR"))
+                print("✓ Added linkedin column")
+            if "github" not in candidate_columns:
+                conn.execute(text("ALTER TABLE candidates ADD COLUMN github VARCHAR"))
+                print("✓ Added github column")
 
 
 app.include_router(auth_router)

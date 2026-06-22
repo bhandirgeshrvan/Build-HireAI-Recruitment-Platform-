@@ -16,6 +16,15 @@ def admin_stats(
     return analytics_controller.get_admin_stats(db)
 
 
+@router.get("/", summary="Recruiter analytics dashboard (recruiter/admin only)")
+def recruiter_analytics(
+    current_user: User = Depends(require_role("recruiter", "admin")),
+    db: Session = Depends(get_db),
+):
+    """Get analytics for the logged-in recruiter including job-wise breakdown"""
+    return analytics_controller.get_recruiter_analytics(db, current_user.id, current_user.role)
+
+
 @router.get("/funnel", summary="Hiring pipeline funnel data (recruiter/admin only)")
 def pipeline_funnel(
     current_user: User = Depends(require_role("recruiter", "admin")),

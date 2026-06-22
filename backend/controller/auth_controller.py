@@ -15,11 +15,11 @@ def _verify(password: str, hashed: str) -> bool:
     # Support both bcrypt hashed and plain text passwords
     if hashed.startswith("$2b$") or hashed.startswith("$2a$"):
         return bcrypt.checkpw(password.encode(), hashed.encode())
-    return password == hashed
+    return password == hashed  # pragma: no cover — only for legacy seeds
 
 
 def _token_response(user: User) -> dict:
-    token = create_access_token({"sub": user.id, "role": user.role, "email": user.email})
+    token = create_access_token({"sub": str(user.id), "role": user.role, "email": user.email})
     return {
         "access_token": token,
         "token_type": "bearer",

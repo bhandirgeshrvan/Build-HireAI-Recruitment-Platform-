@@ -4,6 +4,7 @@ from typing import Optional, List
 from sqlalchemy.orm import Session
 from database_config import get_db
 from controller import candidate_controller
+from controller.enhanced_matching_controller import calculate_comprehensive_match
 from core.dependencies import get_current_user, require_role
 from models.models import User
 
@@ -12,6 +13,9 @@ router = APIRouter(prefix="/candidates", tags=["Candidates"])
 
 class CandidateUpdate(BaseModel):
     name: Optional[str] = None
+    phone: Optional[str] = None
+    linkedin: Optional[str] = None
+    github: Optional[str] = None
     role: Optional[str] = None
     experience: Optional[int] = None
     education: Optional[str] = None
@@ -36,6 +40,16 @@ def my_profile(
     db: Session = Depends(get_db),
 ):
     return candidate_controller.get_candidate_by_user(db, current_user.id)
+
+
+@router.put("/me", summary="Update my candidate profile")
+def update_my_profile(
+    body: CandidateUpdate,
+    current_user: User = Depends(require_role("candidate")),
+    db: Session = Depends(get_db),
+):
+    candidate = candidate_controller.get_candidate_by_user(db, current_user.id)
+    return candidate_controller.update_candidate(db, candidate.id, body.model_dump(exclude_none=True))
 
 
 @router.get("/ranking/{job_id}", summary="Rank all candidates for a job (recruiter/admin only)")
@@ -73,3 +87,22 @@ def update_candidate(
     db: Session = Depends(get_db),
 ):
     return candidate_controller.update_candidate(db, candidate_id, body.model_dump(exclude_none=True))
+
+
+@router.get("/{candidate_id}/match/{job_id}", summary="Get comprehensive match analysis for candidate and job")
+def comprehensive_match(
+    candidate_id: int,
+    job_id: int,
+    current_user: User = Depends(require_role("recruiter", "admin")),
+    db: Session = Depends(get_db),
+):
+    """
+    Comprehensive matching considering:
+    - Technical skills (25%)
+    - Experience (20%)
+    - Projects relevance (20%)
+    - Leadership & ownership (15%)
+    - Soft skills (10%)
+    - Achievements (10%)
+    """
+    return calculate_comprehensive_match(db, candidate_id, job_id)

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, ARRAY
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, ARRAY, JSON
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from database_config import Base
@@ -51,6 +51,9 @@ class Candidate(Base):
     user_id = Column(Integer, ForeignKey("users.id"), unique=True)
     name = Column(String, nullable=False)
     email = Column(String, unique=True)
+    phone = Column(String, nullable=True)
+    linkedin = Column(String, nullable=True)
+    github = Column(String, nullable=True)
     role = Column(String)
     experience = Column(Integer)
     education = Column(String)
@@ -76,6 +79,7 @@ class Resume(Base):
     filename = Column(String, nullable=False)
     file_path = Column(String, nullable=False)
     parsed_skills = Column(ARRAY(String), default=[])
+    parsed_profile = Column(JSON, default=dict)
     raw_text = Column(String)
     uploaded_at = Column(DateTime, default=datetime.utcnow)
 

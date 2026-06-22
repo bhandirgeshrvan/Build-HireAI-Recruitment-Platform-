@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile, File
+from fastapi import APIRouter, Depends, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from database_config import get_db
 from controller import resume_controller
@@ -9,7 +9,16 @@ from models.models import User
 router = APIRouter(prefix="/resumes", tags=["Resumes"])
 
 
-@router.post("/upload", summary="Upload resume PDF/DOCX — parses and extracts skills automatically")
+@router.post("/ats-check", summary="ATS score a resume using Bedrock Llama3 — optionally pass a job description")
+def ats_check(
+    file: UploadFile = File(...),
+    job_description: str = Form(default=""),
+    current_user: User = Depends(require_role("candidate")),
+):
+    return resume_controller.ats_check(file, job_description)
+
+
+@router.post("/upload", summary="Upload resume PDF/DOCX — stores to S3 and extracts skills")
 def upload_resume(
     file: UploadFile = File(...),
     current_user: User = Depends(require_role("candidate")),

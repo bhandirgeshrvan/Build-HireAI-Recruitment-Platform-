@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireAI Login Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #475569;
+            font-size: 14px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        .info {
+            background: #e0e7ff;
+            color: #3730a3;
+            border: 1px solid #a5b4fc;
+            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 HireAI Login Test</h1>
+        <p class="subtitle">Direct API test without React/Vite build system</p>
+
+        <div class="info">
+            <strong>ℹ️ Test Accounts:</strong><br>
+            <strong>Candidate:</strong> aditya.shinde@test.com / TestPassword123!<br>
+            <strong>Recruiter:</strong> john.recruiter@test.com / RecruiterPass123!
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Account Type</label>
+                <select id="accountType" onchange="updateCredentials()">
+                    <option value="candidate">Candidate</option>
+                    <option value="recruiter">Recruiter</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="email" value="john.recruiter@test.com" required>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" value="RecruiterPass123!" required>
+            </div>
+
+            <button type="submit" id="submitBtn">Test Login</button>
+        </form>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:8000';
+
+        const accounts = {
+            candidate: {
+                email: 'aditya.shinde@test.com',
+                password: 'TestPassword123!'
+            },
+            recruiter: {
+                email: 'john.recruiter@test.com',
+                password: 'RecruiterPass123!'
+            }
+        };
+
+        function updateCredentials() {
+            const type = document.getElementById('accountType').value;
+            document.getElementById('email').value = accounts[type].email;
+            document.getElementById('password').value = accounts[type].password;
+        }
+
+        // Set initial values
+        updateCredentials();
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const submitBtn = document.getElementById('submitBtn');
+            const resultDiv = document.getElementById('result');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Testing...';
+            resultDiv.innerHTML = '';
+
+            try {
+                console.log('Making request to:', `${BASE_URL}/auth/login`);
+                console.log('Payload:', { email, password: '***' });
+
+                const response = await fetch(`${BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <strong>✅ Login Successful!</strong><br><br>
+                        <strong>User:</strong> ${data.user.name}<br>
+                        <strong>Email:</strong> ${data.user.email}<br>
+                        <strong>Role:</strong> ${data.user.role}<br>
+                        <strong>Token:</strong> ${data.access_token.substring(0, 50)}...<br><br>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `
+                        <strong>❌ Login Failed</strong><br><br>
+                        <strong>Status:</strong> ${response.status}<br>
+                        <strong>Error:</strong> ${data.detail || 'Unknown error'}<br><br>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <strong>❌ Request Failed</strong><br><br>
+                    <strong>Error:</strong> ${error.message}<br><br>
+                    <strong>Possible reasons:</strong><br>
+                    • Backend server not running<br>
+                    • CORS error<br>
+                    • Network issue<br><br>
+                    <strong>Solution:</strong><br>
+                    1. Make sure backend is running: <code>http://localhost:8000</code><br>
+                    2. Check browser console (F12) for detailed error<br>
+                    3. Verify CORS is enabled in backend
+                `;
+                console.error('Login error:', error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Test Login';
+            }
+        });
+
+        // Test backend connectivity on page load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch(`${BASE_URL}/`);
+                if (response.ok) {
+                    console.log('✅ Backend server is reachable');
+                }
+            } catch (error) {
+                alert('⚠️ Cannot connect to backend server at ' + BASE_URL + '. Make sure it is running.');
+            }
+        });
+    </script>
+</body>
+</html>

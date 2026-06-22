@@ -28,6 +28,14 @@ def apply(
     return application_controller.apply_to_job(db, candidate.id, body.job_id)
 
 
+@router.get("/ranking", summary="All jobs with applicants ranked by ATS score (recruiter/admin only)")
+def ranking(
+    current_user: User = Depends(require_role("recruiter", "admin")),
+    db: Session = Depends(get_db),
+):
+    return application_controller.get_ranking_by_job(db)
+
+
 @router.get("/kanban", summary="Kanban board grouped by pipeline stage (recruiter/admin only)")
 def kanban(
     current_user: User = Depends(require_role("recruiter", "admin")),

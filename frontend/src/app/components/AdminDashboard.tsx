@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../App'
 import { PageHeader, KPICard } from './KPICard'
-import { Users, Briefcase, TrendingUp, Shield, Activity, RefreshCw, Download, Trash2 } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { Users, Briefcase, TrendingUp, Shield, Activity, RefreshCw, Download, Trash2, Filter, BarChart } from 'lucide-react'
+import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 const BASE = import.meta.env.VITE_API_URL ?? ''
 const tt = {
@@ -40,7 +40,7 @@ export function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title={`Admin Panel · ${user?.name ?? 'Admin'} 🛡️`} subtitle="Platform-wide overview — users, jobs, and system health." />
+      <PageHeader title={<span className="flex items-center gap-2">Admin Panel · {user?.name ?? 'Admin'}<Shield size={18} className="text-indigo-600" /></span>} subtitle="Platform-wide overview — users, jobs, and system health." />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard title="Total Users"   value={stats ? String(stats.total_users) : '—'}    delta="registered"  icon={<Users size={15} />}      accentColor="#6366f1" />
@@ -59,34 +59,38 @@ export function AdminDashboard() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className={`${card} p-5`} style={cardStyle}>
-          <p className="text-xs font-bold text-slate-700 mb-4">🔻 Hiring Funnel</p>
+          <p className="text-xs font-bold text-slate-700 mb-4 flex items-center gap-1.5">
+            <Filter size={14} className="text-slate-600" /> Hiring Funnel
+          </p>
           {funnel.length === 0 ? (
             <p className="text-xs text-slate-400 text-center py-8">No funnel data yet.</p>
           ) : (
             <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={funnel} barCategoryGap="35%">
+              <RechartsBarChart data={funnel} barCategoryGap="35%">
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                 <XAxis dataKey="stage" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} />
                 <Tooltip {...tt} />
                 <Bar dataKey="count" fill="#6366f1" radius={[3, 3, 0, 0]} name="Count" />
-              </BarChart>
+              </RechartsBarChart>
             </ResponsiveContainer>
           )}
         </div>
         <div className={`${card} p-5`} style={cardStyle}>
-          <p className="text-xs font-bold text-slate-700 mb-4">👥 Top Candidates by Match Score</p>
+          <p className="text-xs font-bold text-slate-700 mb-4 flex items-center gap-1.5">
+            <Users size={14} className="text-slate-600" /> Top Candidates by Match Score
+          </p>
           {candidates.length === 0 ? (
             <p className="text-xs text-slate-400 text-center py-8">No candidates yet.</p>
           ) : (
             <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={candidates.map(c => ({ name: c.name?.split(' ')[0], score: c.match_score ?? 0 }))} barCategoryGap="35%">
+              <RechartsBarChart data={candidates.map(c => ({ name: c.name?.split(' ')[0], score: c.match_score ?? 0 }))} barCategoryGap="35%">
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                 <XAxis dataKey="name" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} />
                 <Tooltip {...tt} />
                 <Bar dataKey="score" fill="#10b981" radius={[3, 3, 0, 0]} name="Score %" />
-              </BarChart>
+              </RechartsBarChart>
             </ResponsiveContainer>
           )}
         </div>
@@ -96,48 +100,89 @@ export function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className={`${card} overflow-hidden`} style={cardStyle}>
           <div className="px-4 py-3 border-b bg-slate-50" style={{ borderColor: '#e2e8f0' }}>
-            <p className="text-xs font-bold text-slate-900">👥 Recent Candidates</p>
+            <p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+              <Users size={12} /> Recent Candidates
+            </p>
           </div>
           {candidates.length === 0 ? (
             <p className="text-xs text-slate-400 text-center py-6">No candidates yet.</p>
           ) : (
-            <div>
-              <div className="grid text-[9px] font-bold text-slate-400 uppercase tracking-wider px-4 py-2 bg-slate-50"
-                style={{ gridTemplateColumns: '2fr 1.5fr 1.5fr', borderBottom: '1px solid #e2e8f0' }}>
-                <span>Name</span><span>Role</span><span>Status</span>
-              </div>
-              {candidates.map((c: any, i: number) => (
-                <div key={c.id} className="grid items-center px-4 py-2 text-xs hover:bg-slate-50 transition-colors"
-                  style={{ gridTemplateColumns: '2fr 1.5fr 1.5fr', borderBottom: i < candidates.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
-                  <span className="font-semibold text-slate-900 truncate pr-2">{c.name}</span>
-                  <span className="text-slate-500 truncate text-[10px]">{c.role || '—'}</span>
-                  <span className="text-slate-400 text-[10px]">{c.status}</span>
+            <>
+              {/* Desktop table */}
+              <div className="hidden sm:block">
+                <div className="grid text-[9px] font-bold text-slate-400 uppercase tracking-wider px-4 py-2 bg-slate-50"
+                  style={{ gridTemplateColumns: '2fr 1.5fr 1.5fr', borderBottom: '1px solid #e2e8f0' }}>
+                  <span>Name</span><span>Role</span><span>Status</span>
                 </div>
-              ))}
-            </div>
+                {candidates.map((c: any, i: number) => (
+                  <div key={c.id} className="grid items-center px-4 py-2 text-xs hover:bg-slate-50 transition-colors"
+                    style={{ gridTemplateColumns: '2fr 1.5fr 1.5fr', borderBottom: i < candidates.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
+                    <span className="font-semibold text-slate-900 truncate pr-2">{c.name}</span>
+                    <span className="text-slate-500 truncate text-[10px]">{c.role || '—'}</span>
+                    <span className="text-slate-400 text-[10px]">{c.status}</span>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Mobile cards */}
+              <div className="sm:hidden space-y-2 p-3">
+                {candidates.map((c: any) => (
+                  <div key={c.id} className="p-3 rounded-lg border bg-white" style={{ borderColor: '#e2e8f0' }}>
+                    <p className="text-sm font-bold text-slate-900">{c.name}</p>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
+                      <span>{c.role || '—'}</span>
+                      <span>•</span>
+                      <span className="text-slate-400">{c.status}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
         <div className={`${card} overflow-hidden`} style={cardStyle}>
           <div className="px-4 py-3 border-b bg-slate-50" style={{ borderColor: '#e2e8f0' }}>
-            <p className="text-xs font-bold text-slate-900">📋 Recent Job Listings</p>
+            <p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+              <Briefcase size={12} /> Recent Job Listings
+            </p>
           </div>
           {jobs.length === 0 ? (
             <p className="text-xs text-slate-400 text-center py-6">No jobs yet.</p>
           ) : (
-            <div>
-              <div className="grid text-[9px] font-bold text-slate-400 uppercase tracking-wider px-4 py-2 bg-slate-50"
-                style={{ gridTemplateColumns: '2fr 1.5fr 0.8fr', borderBottom: '1px solid #e2e8f0' }}>
-                <span>Title</span><span>Company</span><span>Apps</span>
-              </div>
-              {jobs.map((j: any, i: number) => (
-                <div key={j.id} className="grid items-center px-4 py-2 text-xs hover:bg-slate-50 transition-colors"
-                  style={{ gridTemplateColumns: '2fr 1.5fr 0.8fr', borderBottom: i < jobs.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
-                  <span className="font-semibold text-slate-900 truncate pr-2">{j.title}</span>
-                  <span className="text-slate-500 text-[10px]">{j.company}</span>
-                  <span className="font-bold text-emerald-600">{j.applicants ?? 0}</span>
+            <>
+              {/* Desktop table */}
+              <div className="hidden sm:block">
+                <div className="grid text-[9px] font-bold text-slate-400 uppercase tracking-wider px-4 py-2 bg-slate-50"
+                  style={{ gridTemplateColumns: '2fr 1.5fr 0.8fr', borderBottom: '1px solid #e2e8f0' }}>
+                  <span>Title</span><span>Company</span><span>Apps</span>
                 </div>
-              ))}
-            </div>
+                {jobs.map((j: any, i: number) => (
+                  <div key={j.id} className="grid items-center px-4 py-2 text-xs hover:bg-slate-50 transition-colors"
+                    style={{ gridTemplateColumns: '2fr 1.5fr 0.8fr', borderBottom: i < jobs.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
+                    <span className="font-semibold text-slate-900 truncate pr-2">{j.title}</span>
+                    <span className="text-slate-500 text-[10px]">{j.company}</span>
+                    <span className="font-bold text-emerald-600">{j.applicants ?? 0}</span>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Mobile cards */}
+              <div className="sm:hidden space-y-2 p-3">
+                {jobs.map((j: any) => (
+                  <div key={j.id} className="p-3 rounded-lg border bg-white" style={{ borderColor: '#e2e8f0' }}>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-slate-900">{j.title}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">{j.company}</p>
+                      </div>
+                      <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full flex-shrink-0">
+                        {j.applicants ?? 0}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </div>

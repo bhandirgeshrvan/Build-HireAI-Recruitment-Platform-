@@ -6,9 +6,12 @@ import { Landing } from './components/Landing'
 import { Login } from './components/Login'
 import { Signup } from './components/Signup'
 import { CandidateDashboard } from './components/CandidateDashboard'
+import { CandidateProfile } from './components/CandidateProfile'
 import { ResumeParser } from './components/ResumeParser'
 import { JobSearch } from './components/JobSearch'
+import { ManageJobs } from './components/ManageJobs'
 import { ApplicationTracking } from './components/ApplicationTracking'
+import { JobDetail } from './components/JobDetail'
 import { RecruiterDashboard } from './components/RecruiterDashboard'
 import { JobPosting } from './components/JobPosting'
 import { CandidateRanking } from './components/CandidateRanking'
@@ -19,17 +22,25 @@ import { auth, token } from './api'
 // -- Page type
 export type Page =
   | 'landing' | 'login' | 'signup'
-  | 'candidate-dashboard' | 'resume-parser' | 'job-search' | 'application-tracking'
-  | 'recruiter-dashboard' | 'job-posting' | 'candidate-ranking' | 'analytics'
+  | 'candidate-dashboard' | 'candidate-profile' | 'resume-analyzer' | 'job-search' | 'application-tracking'
+  | 'job-detail'
+  | 'recruiter-dashboard' | 'job-posting' | 'manage-jobs' | 'candidate-ranking' | 'analytics'
   | 'admin-dashboard'
 
 const PROTECTED: Page[] = [
-  'candidate-dashboard', 'resume-parser', 'application-tracking',
-  'recruiter-dashboard', 'job-posting', 'candidate-ranking',
+  'candidate-dashboard', 'candidate-profile', 'resume-analyzer', 'application-tracking', 'job-detail',
+  'recruiter-dashboard', 'job-posting', 'manage-jobs', 'candidate-ranking',
   'analytics', 'admin-dashboard',
 ]
 
 const PUBLIC_ONLY: Page[] = ['landing', 'login', 'signup']
+
+// Pages each role is allowed to access
+const ROLE_PAGES: Record<Role, Page[]> = {
+  candidate: ['candidate-dashboard', 'candidate-profile', 'resume-analyzer', 'job-search', 'application-tracking', 'job-detail'],
+  recruiter: ['recruiter-dashboard', 'job-posting', 'manage-jobs', 'candidate-ranking', 'analytics'],
+  admin:     ['admin-dashboard', 'analytics', 'candidate-ranking', 'job-search', 'recruiter-dashboard', 'job-posting'],
+}
 
 // -- Auth context
 interface AuthCtx {
@@ -42,22 +53,25 @@ export const AuthContext = createContext<AuthCtx>({} as AuthCtx)
 export const useAuth = () => useContext(AuthContext)
 
 // -- Nav context
-interface NavCtx { currentPage: Page; navigate: (p: Page) => void }
+interface NavCtx { currentPage: Page; navigate: (p: Page, opts?: { jobId?: number; editJobId?: number }) => void; jobId?: number; editJobId?: number }
 export const NavContext = createContext<NavCtx>({} as NavCtx)
 export const useNav = () => useContext(NavContext)
 
 // -- Page renderer
-function PageRenderer({ page }: { page: Page }) {
+function PageRenderer({ page, jobId, editJobId }: { page: Page; jobId?: number; editJobId?: number }) {
   switch (page) {
     case 'landing':               return <Landing />
     case 'login':                 return <Login />
     case 'signup':                return <Signup />
     case 'candidate-dashboard':   return <CandidateDashboard />
-    case 'resume-parser':         return <ResumeParser />
+    case 'candidate-profile':     return <CandidateProfile />
+    case 'resume-analyzer':        return <ResumeParser />
     case 'job-search':            return <JobSearch />
+    case 'manage-jobs':           return <ManageJobs />
     case 'application-tracking':  return <ApplicationTracking />
+    case 'job-detail':            return jobId ? <JobDetail jobId={jobId} /> : <CandidateDashboard />
     case 'recruiter-dashboard':   return <RecruiterDashboard />
-    case 'job-posting':           return <JobPosting />
+    case 'job-posting':           return <JobPosting editJobId={editJobId} />
     case 'candidate-ranking':     return <CandidateRanking />
     case 'analytics':             return <Analytics />
     case 'admin-dashboard':       return <AdminDashboard />
@@ -68,6 +82,8 @@ function PageRenderer({ page }: { page: Page }) {
 export default function App() {
   const [user, setUser] = useState<User | null>(null)
   const [currentPage, setCurrentPage] = useState<Page>('landing')
+  const [currentJobId, setCurrentJobId]   = useState<number | undefined>(undefined)
+  const [currentEditJobId, setCurrentEditJobId] = useState<number | undefined>(undefined)
   const [bootstrapped, setBootstrapped] = useState(false)
 
   useEffect(() => {
@@ -95,11 +111,22 @@ export default function App() {
     }
   }, [])
 
-  const navigate = (page: Page) => {
+  const navigate = (page: Page, opts?: { jobId?: number; editJobId?: number }) => {
     if (PROTECTED.includes(page) && !user) {
       setCurrentPage('login')
       return
     }
+    if (user && PROTECTED.includes(page) && !ROLE_PAGES[user.role].includes(page)) {
+      const dash: Record<Role, Page> = {
+        candidate: 'candidate-dashboard',
+        recruiter: 'recruiter-dashboard',
+        admin:     'admin-dashboard',
+      }
+      setCurrentPage(dash[user.role])
+      return
+    }
+    if (opts?.jobId !== undefined) setCurrentJobId(opts.jobId)
+    if (opts?.editJobId !== undefined) setCurrentEditJobId(opts.editJobId)
     setCurrentPage(page)
   }
 
@@ -150,13 +177,13 @@ export default function App() {
 
   return (
     <AuthContext.Provider value={{ user, login, signup, logout }}>
-      <NavContext.Provider value={{ currentPage, navigate }}>
+      <NavContext.Provider value={{ currentPage, navigate, jobId: currentJobId, editJobId: currentEditJobId }}>
         <div className="min-h-screen bg-background text-foreground">
           {isPublicPage ? (
-            <PageRenderer page={currentPage} />
+            <PageRenderer page={currentPage} jobId={currentJobId} />
           ) : (
             <Layout>
-              <PageRenderer page={currentPage} />
+              <PageRenderer page={currentPage} jobId={currentJobId} editJobId={currentEditJobId} />
             </Layout>
           )}
         </div>
